@@ -17,6 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 import { DOMAINS, useSuppliers, type Supplier } from "@/lib/suppliers-store";
 import { SupplierForm } from "@/components/supplier-form";
+import { EmailGenerator } from "@/components/email-generator";
 
 export const Route = createFileRoute("/")({
   head: () => ({
