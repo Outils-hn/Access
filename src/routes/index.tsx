@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Search, Pencil, Trash2, ExternalLink, Box, Mail, Phone, Building2, MailPlus } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, ExternalLink, Box, Mail, Phone, Building2, MailPlus, Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-import { DOMAINS, useSuppliers, type Supplier } from "@/lib/suppliers-store";
+import { useSuppliers, useDomains, domainColor, type Supplier } from "@/lib/suppliers-store";
 import { SupplierForm } from "@/components/supplier-form";
 import { EmailGenerator } from "@/components/email-generator";
 
@@ -33,6 +33,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { suppliers, upsert, remove } = useSuppliers();
+  const { domains } = useDomains();
   const [query, setQuery] = useState("");
   const [domainFilter, setDomainFilter] = useState<string>("all");
   const [open, setOpen] = useState(false);
@@ -59,10 +60,10 @@ function Index() {
 
   return (
     <main className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card/40 backdrop-blur">
+      <header className="border-b border-border bg-card/60 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary ring-1 ring-primary/30">
               <Building2 className="h-5 w-5" />
             </div>
             <div>
@@ -70,9 +71,14 @@ function Index() {
               <p className="text-xs text-muted-foreground">Bureau d'études — Façade</p>
             </div>
           </div>
-          <Button onClick={openNew} className="gap-2">
-            <Plus className="h-4 w-4" /> Nouveau fournisseur
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" className="gap-2">
+              <Link to="/configuration"><Settings className="h-4 w-4" /> Configuration</Link>
+            </Button>
+            <Button onClick={openNew} className="gap-2">
+              <Plus className="h-4 w-4" /> Nouveau fournisseur
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -88,12 +94,12 @@ function Index() {
             />
           </div>
           <Select value={domainFilter} onValueChange={setDomainFilter}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-[220px]">
               <SelectValue placeholder="Filtrer par domaine" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tous les domaines</SelectItem>
-              {DOMAINS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+              {domains.map((d) => <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>)}
             </SelectContent>
           </Select>
           <Badge variant="secondary" className="ml-auto">
@@ -101,16 +107,16 @@ function Index() {
           </Badge>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-border bg-card">
+        <div className="overflow-hidden rounded-xl border border-border/80 bg-card shadow-lg shadow-black/20">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead>Fournisseur</TableHead>
-                <TableHead>Domaine</TableHead>
-                <TableHead>Liens</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead className="max-w-[280px]">Notes</TableHead>
-                <TableHead className="w-[140px] text-right">Actions</TableHead>
+              <TableRow className="border-b border-border/80 bg-muted/40 hover:bg-muted/40">
+                <TableHead className="text-foreground/90 font-semibold">Fournisseur</TableHead>
+                <TableHead className="text-foreground/90 font-semibold">Domaine</TableHead>
+                <TableHead className="text-foreground/90 font-semibold">Liens</TableHead>
+                <TableHead className="text-foreground/90 font-semibold">Contact</TableHead>
+                <TableHead className="max-w-[280px] text-foreground/90 font-semibold">Notes</TableHead>
+                <TableHead className="w-[140px] text-right text-foreground/90 font-semibold">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -120,11 +126,14 @@ function Index() {
                     Aucun fournisseur trouvé.
                   </TableCell>
                 </TableRow>
-              ) : filtered.map((s) => (
-                <TableRow key={s.id}>
-                  <TableCell className="font-medium">{s.name}</TableCell>
+              ) : filtered.map((s, idx) => (
+                <TableRow
+                  key={s.id}
+                  className={`border-b border-border/40 transition-colors hover:bg-primary/10 hover:ring-1 hover:ring-primary/30 ${idx % 2 === 0 ? "bg-card" : "bg-muted/20"}`}
+                >
+                  <TableCell className="font-medium text-foreground">{s.name}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="border-primary/30 text-primary">{s.domain}</Badge>
+                    <Badge variant="outline" className={`border ${domainColor(s.domain)} font-medium`}>{s.domain}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
@@ -144,7 +153,7 @@ function Index() {
                   </TableCell>
                   <TableCell>
                     <div className="space-y-0.5 text-sm">
-                      {s.contactName && <div>{s.contactName}</div>}
+                      {s.contactName && <div className="text-foreground">{s.contactName}</div>}
                       {s.contactEmail && (
                         <a href={`mailto:${s.contactEmail}`} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary">
                           <Mail className="h-3 w-3" />{s.contactEmail}
@@ -162,8 +171,7 @@ function Index() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
-                      <Button size="icon" variant="ghost" onClick={() => setMailFor(s)} aria-label="Générer un mail"
-                              title="Générer un mail">
+                      <Button size="icon" variant="ghost" onClick={() => setMailFor(s)} aria-label="Générer un mail" title="Générer un mail">
                         <MailPlus className="h-4 w-4" />
                       </Button>
                       <Button size="icon" variant="ghost" onClick={() => openEdit(s)} aria-label="Modifier">
@@ -192,7 +200,7 @@ function Index() {
           </DialogHeader>
           <SupplierForm
             initial={editing}
-            onSubmit={(s) => { upsert(s); setOpen(false); }}
+            onSubmit={async (s) => { await upsert(s); setOpen(false); }}
             onCancel={() => setOpen(false)}
           />
         </DialogContent>
