@@ -107,16 +107,16 @@ function Index() {
           </Badge>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-border/80 bg-card shadow-lg shadow-black/20">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl shadow-black/30">
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-border/80 bg-muted/40 hover:bg-muted/40">
-                <TableHead className="text-foreground/90 font-semibold">Fournisseur</TableHead>
-                <TableHead className="text-foreground/90 font-semibold">Domaine</TableHead>
-                <TableHead className="text-foreground/90 font-semibold">Liens</TableHead>
-                <TableHead className="text-foreground/90 font-semibold">Contact</TableHead>
-                <TableHead className="max-w-[280px] text-foreground/90 font-semibold">Notes</TableHead>
-                <TableHead className="w-[140px] text-right text-foreground/90 font-semibold">Actions</TableHead>
+              <TableRow className="border-b-2 border-border bg-secondary/60 hover:bg-secondary/60">
+                <TableHead className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground">Fournisseur</TableHead>
+                <TableHead className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground">Domaine</TableHead>
+                <TableHead className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground">Liens</TableHead>
+                <TableHead className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground">Contact</TableHead>
+                <TableHead className="max-w-[280px] px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground">Notes</TableHead>
+                <TableHead className="w-[160px] px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -126,16 +126,18 @@ function Index() {
                     Aucun fournisseur trouvé.
                   </TableCell>
                 </TableRow>
-              ) : filtered.map((s, idx) => (
+              ) : filtered.map((s) => (
                 <TableRow
                   key={s.id}
-                  className={`border-b border-border/40 transition-colors hover:bg-primary/10 hover:ring-1 hover:ring-primary/30 ${idx % 2 === 0 ? "bg-card" : "bg-muted/20"}`}
+                  className="group border-b border-border/70 transition-colors hover:bg-accent/40 data-[state=selected]:bg-accent/50"
                 >
-                  <TableCell className="font-medium text-foreground">{s.name}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={`border ${domainColor(s.domain)} font-medium`}>{s.domain}</Badge>
+                  <TableCell className="px-6 py-4 align-middle">
+                    <span className="text-[15px] font-semibold tracking-tight text-foreground">{s.name}</span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="px-6 py-4 align-middle">
+                    <Badge variant="outline" className={`border ${domainColor(s.domain)} px-2.5 py-0.5 text-xs font-semibold shadow-sm`}>{s.domain}</Badge>
+                  </TableCell>
+                  <TableCell className="px-6 py-4 align-middle">
                     <div className="flex flex-col gap-1">
                       {s.website && (
                         <a href={s.website} target="_blank" rel="noreferrer"
@@ -151,9 +153,9 @@ function Index() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="px-6 py-4 align-middle">
                     <div className="space-y-0.5 text-sm">
-                      {s.contactName && <div className="text-foreground">{s.contactName}</div>}
+                      {s.contactName && <div className="font-medium text-foreground">{s.contactName}</div>}
                       {s.contactEmail && (
                         <a href={`mailto:${s.contactEmail}`} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary">
                           <Mail className="h-3 w-3" />{s.contactEmail}
@@ -166,11 +168,11 @@ function Index() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="max-w-[280px]">
+                  <TableCell className="max-w-[280px] px-6 py-4 align-middle">
                     <p className="line-clamp-2 text-sm text-muted-foreground">{s.notes}</p>
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
+                  <TableCell className="px-6 py-4 text-right align-middle">
+                    <div className="flex justify-end gap-1 opacity-80 transition-opacity group-hover:opacity-100">
                       <Button size="icon" variant="ghost" onClick={() => setMailFor(s)} aria-label="Générer un mail" title="Générer un mail">
                         <MailPlus className="h-4 w-4" />
                       </Button>
