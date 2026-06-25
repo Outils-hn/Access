@@ -217,6 +217,18 @@ function Index() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!mailFor} onOpenChange={(o) => !o && setMailFor(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Générer un mail — {mailFor?.name}</DialogTitle>
+            <DialogDescription>
+              Renseignez le contexte chantier, choisissez un modèle puis copiez ou ouvrez dans Outlook.
+            </DialogDescription>
+          </DialogHeader>
+          {mailFor && <EmailGenerator supplier={mailFor} onClose={() => setMailFor(null)} />}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
