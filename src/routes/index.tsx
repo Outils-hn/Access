@@ -162,6 +162,10 @@ function Index() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
+                      <Button size="icon" variant="ghost" onClick={() => setMailFor(s)} aria-label="Générer un mail"
+                              title="Générer un mail">
+                        <MailPlus className="h-4 w-4" />
+                      </Button>
                       <Button size="icon" variant="ghost" onClick={() => openEdit(s)} aria-label="Modifier">
                         <Pencil className="h-4 w-4" />
                       </Button>
