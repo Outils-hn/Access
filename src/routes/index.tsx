@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Search, Pencil, Trash2, ExternalLink, Box, Mail, Phone, Building2 } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, ExternalLink, Box, Mail, Phone, Building2, MailPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 import { DOMAINS, useSuppliers, type Supplier } from "@/lib/suppliers-store";
 import { SupplierForm } from "@/components/supplier-form";
+import { EmailGenerator } from "@/components/email-generator";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -37,6 +38,7 @@ function Index() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Supplier | null>(null);
   const [toDelete, setToDelete] = useState<Supplier | null>(null);
+  const [mailFor, setMailFor] = useState<Supplier | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -108,7 +110,7 @@ function Index() {
                 <TableHead>Liens</TableHead>
                 <TableHead>Contact</TableHead>
                 <TableHead className="max-w-[280px]">Notes</TableHead>
-                <TableHead className="w-[100px] text-right">Actions</TableHead>
+                <TableHead className="w-[140px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -160,6 +162,10 @@ function Index() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
+                      <Button size="icon" variant="ghost" onClick={() => setMailFor(s)} aria-label="Générer un mail"
+                              title="Générer un mail">
+                        <MailPlus className="h-4 w-4" />
+                      </Button>
                       <Button size="icon" variant="ghost" onClick={() => openEdit(s)} aria-label="Modifier">
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -211,6 +217,18 @@ function Index() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!mailFor} onOpenChange={(o) => !o && setMailFor(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Générer un mail — {mailFor?.name}</DialogTitle>
+            <DialogDescription>
+              Renseignez le contexte chantier, choisissez un modèle puis copiez ou ouvrez dans Outlook.
+            </DialogDescription>
+          </DialogHeader>
+          {mailFor && <EmailGenerator supplier={mailFor} onClose={() => setMailFor(null)} />}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
