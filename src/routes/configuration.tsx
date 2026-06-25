@@ -207,64 +207,66 @@ function TemplateEditor({
   initial: EmailTemplate | null;
   onSave: (t: { id?: string; title: string; subject: string; body: string }) => void;
 }) {
-  const [title, setTitle] = useState("");
-  const [subject, setSubject] = useState("");
-  const [body, setBody] = useState("");
-
-  // Reset form when dialog opens
-  useState(() => {});
-  // Use effect via key trick — synchronise initial when opened
-  if (open && initial && title === "" && subject === "" && body === "") {
-    setTitle(initial.title);
-    setSubject(initial.subject);
-    setBody(initial.body);
-  }
-
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(o) => {
-        onOpenChange(o);
-        if (!o) { setTitle(""); setSubject(""); setBody(""); }
-        if (o && initial) { setTitle(initial.title); setSubject(initial.subject); setBody(initial.body); }
-        if (o && !initial) { setTitle(""); setSubject(""); setBody(""); }
-      }}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{initial ? "Modifier le modèle" : "Nouveau modèle"}</DialogTitle>
-          <DialogDescription>
-            Variables : <code>{"{numero_chantier}"}</code>, <code>{"{nom_chantier}"}</code>, <code>{"{numero_tache}"}</code>, <code>{"{nom_fournisseur}"}</code>, <code>{"{nom_contact}"}</code>
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="t-title">Titre</Label>
-            <Input id="t-title" value={title} onChange={(e) => setTitle(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="t-subject">Objet</Label>
-            <Input id="t-subject" value={subject} onChange={(e) => setSubject(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="t-body">Corps du mail</Label>
-            <Textarea id="t-body" rows={12} value={body} onChange={(e) => setBody(e.target.value)} className="font-mono text-xs" />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="gap-2">
-            <X className="h-4 w-4" /> Annuler
-          </Button>
-          <Button
-            type="button"
-            disabled={!title.trim()}
-            onClick={() => onSave({ id: initial?.id, title: title.trim(), subject, body })}
-            className="gap-2"
-          >
-            <Save className="h-4 w-4" /> Enregistrer
-          </Button>
-        </DialogFooter>
+        <TemplateEditorBody
+          key={initial?.id ?? "new"}
+          initial={initial}
+          onSave={onSave}
+          onCancel={() => onOpenChange(false)}
+        />
       </DialogContent>
     </Dialog>
+  );
+}
+
+function TemplateEditorBody({
+  initial, onSave, onCancel,
+}: {
+  initial: EmailTemplate | null;
+  onSave: (t: { id?: string; title: string; subject: string; body: string }) => void;
+  onCancel: () => void;
+}) {
+  const [title, setTitle] = useState(initial?.title ?? "");
+  const [subject, setSubject] = useState(initial?.subject ?? "");
+  const [body, setBody] = useState(initial?.body ?? "");
+
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle>{initial ? "Modifier le modèle" : "Nouveau modèle"}</DialogTitle>
+        <DialogDescription>
+          Variables : <code>{"{numero_chantier}"}</code>, <code>{"{nom_chantier}"}</code>, <code>{"{numero_tache}"}</code>, <code>{"{nom_fournisseur}"}</code>, <code>{"{nom_contact}"}</code>
+        </DialogDescription>
+      </DialogHeader>
+      <div className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="t-title">Titre</Label>
+          <Input id="t-title" value={title} onChange={(e) => setTitle(e.target.value)} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="t-subject">Objet</Label>
+          <Input id="t-subject" value={subject} onChange={(e) => setSubject(e.target.value)} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="t-body">Corps du mail</Label>
+          <Textarea id="t-body" rows={12} value={body} onChange={(e) => setBody(e.target.value)} className="font-mono text-xs" />
+        </div>
+      </div>
+      <DialogFooter>
+        <Button type="button" variant="ghost" onClick={onCancel} className="gap-2">
+          <X className="h-4 w-4" /> Annuler
+        </Button>
+        <Button
+          type="button"
+          disabled={!title.trim()}
+          onClick={() => onSave({ id: initial?.id, title: title.trim(), subject, body })}
+          className="gap-2"
+        >
+          <Save className="h-4 w-4" /> Enregistrer
+        </Button>
+      </DialogFooter>
+    </>
   );
 }
