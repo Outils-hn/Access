@@ -110,7 +110,7 @@ function Index() {
                 <TableHead>Liens</TableHead>
                 <TableHead>Contact</TableHead>
                 <TableHead className="max-w-[280px]">Notes</TableHead>
-                <TableHead className="w-[100px] text-right">Actions</TableHead>
+                <TableHead className="w-[140px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
