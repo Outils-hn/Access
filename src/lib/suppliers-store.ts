@@ -183,16 +183,16 @@ export function useEmailTemplates() {
 /* ---------- DOMAIN COLORS (consistent badges) ---------- */
 
 const DOMAIN_PALETTE = [
-  "bg-sky-500/15 text-sky-300 border-sky-500/40",
-  "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
-  "bg-amber-500/15 text-amber-300 border-amber-500/40",
-  "bg-violet-500/15 text-violet-300 border-violet-500/40",
-  "bg-rose-500/15 text-rose-300 border-rose-500/40",
-  "bg-cyan-500/15 text-cyan-300 border-cyan-500/40",
-  "bg-orange-500/15 text-orange-300 border-orange-500/40",
-  "bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/40",
-  "bg-lime-500/15 text-lime-300 border-lime-500/40",
-  "bg-indigo-500/15 text-indigo-300 border-indigo-500/40",
+  "bg-sky-300 text-sky-950 border-sky-500/70",
+  "bg-emerald-300 text-emerald-950 border-emerald-500/70",
+  "bg-amber-300 text-amber-950 border-amber-500/70",
+  "bg-violet-300 text-violet-950 border-violet-500/70",
+  "bg-rose-300 text-rose-950 border-rose-500/70",
+  "bg-cyan-300 text-cyan-950 border-cyan-500/70",
+  "bg-orange-300 text-orange-950 border-orange-500/70",
+  "bg-fuchsia-300 text-fuchsia-950 border-fuchsia-500/70",
+  "bg-lime-300 text-lime-950 border-lime-500/70",
+  "bg-indigo-300 text-indigo-950 border-indigo-500/70",
 ];
 
 export function domainColor(name: string): string {
