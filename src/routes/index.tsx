@@ -38,6 +38,7 @@ function Index() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Supplier | null>(null);
   const [toDelete, setToDelete] = useState<Supplier | null>(null);
+  const [mailFor, setMailFor] = useState<Supplier | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
