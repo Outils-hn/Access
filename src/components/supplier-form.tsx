@@ -1,10 +1,17 @@
 import { useState, useEffect } from "react";
+import { Plus } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DOMAINS, type Supplier } from "@/lib/suppliers-store";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
+import { useDomains, type Supplier } from "@/lib/suppliers-store";
 
 type Props = {
   initial?: Supplier | null;
@@ -15,7 +22,7 @@ type Props = {
 const empty: Supplier = {
   id: "",
   name: "",
-  domain: "Aluminium",
+  domain: "",
   website: "",
   cadWebsite: "",
   contactName: "",
@@ -25,11 +32,21 @@ const empty: Supplier = {
 };
 
 export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
+  const { domains, add } = useDomains();
   const [form, setForm] = useState<Supplier>(empty);
+  const [newDomainOpen, setNewDomainOpen] = useState(false);
+  const [newDomain, setNewDomain] = useState("");
 
   useEffect(() => {
     setForm(initial ?? empty);
   }, [initial]);
+
+  // Preselect first domain when none set and list loaded
+  useEffect(() => {
+    if (!form.domain && domains.length > 0) {
+      setForm((f) => ({ ...f, domain: domains[0].name }));
+    }
+  }, [domains, form.domain]);
 
   const set = <K extends keyof Supplier>(k: K, v: Supplier[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -37,7 +54,16 @@ export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.domain) return;
-    onSubmit({ ...form, id: form.id || crypto.randomUUID() });
+    onSubmit(form);
+  };
+
+  const createDomain = async () => {
+    const created = await add(newDomain);
+    if (created) {
+      set("domain", created.name);
+      setNewDomain("");
+      setNewDomainOpen(false);
+    }
   };
 
   return (
@@ -49,12 +75,17 @@ export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
         </div>
         <div className="space-y-2">
           <Label htmlFor="domain">Domaine *</Label>
-          <Select value={form.domain} onValueChange={(v) => set("domain", v)}>
-            <SelectTrigger id="domain"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {DOMAINS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2">
+            <Select value={form.domain} onValueChange={(v) => set("domain", v)}>
+              <SelectTrigger id="domain" className="flex-1"><SelectValue placeholder="Choisir un domaine" /></SelectTrigger>
+              <SelectContent>
+                {domains.map((d) => <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Button type="button" size="icon" variant="outline" onClick={() => setNewDomainOpen(true)} title="Ajouter un domaine">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="website">Site web principal</Label>
@@ -93,6 +124,26 @@ export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
         <Button type="button" variant="ghost" onClick={onCancel}>Annuler</Button>
         <Button type="submit">{initial ? "Enregistrer" : "Ajouter"}</Button>
       </div>
+
+      <Dialog open={newDomainOpen} onOpenChange={setNewDomainOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Nouveau domaine</DialogTitle>
+            <DialogDescription>Ajoutez un domaine à la liste de référence.</DialogDescription>
+          </DialogHeader>
+          <Input
+            value={newDomain}
+            onChange={(e) => setNewDomain(e.target.value)}
+            placeholder="Ex: Garde-corps"
+            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); createDomain(); } }}
+            autoFocus
+          />
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={() => setNewDomainOpen(false)}>Annuler</Button>
+            <Button type="button" onClick={createDomain} disabled={!newDomain.trim()}>Ajouter</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 }

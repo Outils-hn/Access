@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Copy, Mail, Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -8,74 +8,36 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import type { Supplier } from "@/lib/suppliers-store";
+import { useEmailTemplates, type Supplier } from "@/lib/suppliers-store";
 
-type TemplateId = "devis" | "cao";
-
-const TEMPLATES: Record<TemplateId, { label: string; subject: (c: Ctx) => string; body: (c: Ctx) => string }> = {
-  devis: {
-    label: "Demande de prix / Devis",
-    subject: ({ chantierNum, chantierNom, taskNum }) =>
-      `Demande de prix — Chantier ${chantierNum} ${chantierNom} — Tâche ${taskNum}`,
-    body: ({ supplierName, contactName, chantierNum, chantierNom, taskNum }) =>
-`Bonjour${contactName ? " " + contactName : ""},
-
-Dans le cadre de notre chantier n° ${chantierNum} — ${chantierNom} (Tâche ${taskNum}), nous étudions actuellement les solutions ${supplierName} pour la partie façade.
-
-Pourriez-vous nous transmettre :
-  • un devis détaillé selon les éléments en pièce jointe,
-  • les délais de fabrication et de livraison sur site,
-  • les conditions commerciales applicables.
-
-Restant à votre disposition pour tout complément technique,
-
-Cordialement,`,
-  },
-  cao: {
-    label: "Demande de fichiers CAO / BIM spécifiques",
-    subject: ({ chantierNum, chantierNom, taskNum }) =>
-      `Demande de fichiers CAO/BIM — Chantier ${chantierNum} ${chantierNom} — Tâche ${taskNum}`,
-    body: ({ supplierName, contactName, chantierNum, chantierNom, taskNum }) =>
-`Bonjour${contactName ? " " + contactName : ""},
-
-Dans le cadre du chantier n° ${chantierNum} — ${chantierNom} (Tâche ${taskNum}), nous intégrons actuellement les produits ${supplierName} dans nos plans d'exécution façade.
-
-Pourriez-vous nous fournir les ressources techniques suivantes :
-  • familles Revit / objets BIM des références retenues,
-  • blocs DWG 2D et 3D associés,
-  • fiches techniques et carnets de détails à jour.
-
-Merci par avance pour votre retour.
-
-Cordialement,`,
-  },
-};
-
-type Ctx = {
-  supplierName: string;
-  contactName?: string;
-  chantierNum: string;
-  chantierNom: string;
-  taskNum: string;
-};
+function applyVars(text: string, vars: Record<string, string>) {
+  return text.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
+}
 
 export function EmailGenerator({ supplier, onClose }: { supplier: Supplier; onClose: () => void }) {
+  const { templates } = useEmailTemplates();
   const [chantierNum, setChantierNum] = useState("");
   const [chantierNom, setChantierNom] = useState("");
   const [taskNum, setTaskNum] = useState("");
-  const [tpl, setTpl] = useState<TemplateId>("devis");
+  const [tplId, setTplId] = useState<string>("");
   const [copied, setCopied] = useState(false);
 
-  const ctx: Ctx = {
-    supplierName: supplier.name,
-    contactName: supplier.contactName,
-    chantierNum: chantierNum || "[N° chantier]",
-    chantierNom: chantierNom || "[Nom chantier]",
-    taskNum: taskNum || "[N° tâche]",
+  useEffect(() => {
+    if (!tplId && templates.length > 0) setTplId(templates[0].id);
+  }, [templates, tplId]);
+
+  const tpl = templates.find((t) => t.id === tplId);
+
+  const vars: Record<string, string> = {
+    numero_chantier: chantierNum || "[N° chantier]",
+    nom_chantier: chantierNom || "[Nom chantier]",
+    numero_tache: taskNum || "[N° tâche]",
+    nom_fournisseur: supplier.name,
+    nom_contact: supplier.contactName ?? "",
   };
 
-  const subject = useMemo(() => TEMPLATES[tpl].subject(ctx), [tpl, ctx]);
-  const body = useMemo(() => TEMPLATES[tpl].body(ctx), [tpl, ctx]);
+  const subject = useMemo(() => (tpl ? applyVars(tpl.subject, vars) : ""), [tpl, chantierNum, chantierNom, taskNum, supplier]);
+  const body = useMemo(() => (tpl ? applyVars(tpl.body, vars) : ""), [tpl, chantierNum, chantierNom, taskNum, supplier]);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(`Objet : ${subject}\n\n${body}`);
@@ -104,14 +66,17 @@ export function EmailGenerator({ supplier, onClose }: { supplier: Supplier; onCl
 
       <div className="space-y-1.5">
         <Label>Modèle de mail</Label>
-        <Select value={tpl} onValueChange={(v) => setTpl(v as TemplateId)}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
+        <Select value={tplId} onValueChange={setTplId}>
+          <SelectTrigger><SelectValue placeholder={templates.length ? "Choisir un modèle" : "Aucun modèle disponible"} /></SelectTrigger>
           <SelectContent>
-            {(Object.keys(TEMPLATES) as TemplateId[]).map((k) => (
-              <SelectItem key={k} value={k}>{TEMPLATES[k].label}</SelectItem>
+            {templates.map((t) => (
+              <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>
             ))}
           </SelectContent>
         </Select>
+        <p className="text-xs text-muted-foreground">
+          Variables disponibles : <code>{"{numero_chantier}"}</code>, <code>{"{nom_chantier}"}</code>, <code>{"{numero_tache}"}</code>, <code>{"{nom_fournisseur}"}</code>, <code>{"{nom_contact}"}</code>
+        </p>
       </div>
 
       <div className="space-y-1.5">
@@ -134,11 +99,11 @@ export function EmailGenerator({ supplier, onClose }: { supplier: Supplier; onCl
 
       <div className="flex flex-wrap justify-end gap-2 pt-2">
         <Button variant="ghost" onClick={onClose}>Fermer</Button>
-        <Button variant="outline" onClick={handleCopy} className="gap-2">
+        <Button variant="outline" onClick={handleCopy} className="gap-2" disabled={!tpl}>
           {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
           {copied ? "Copié" : "Copier"}
         </Button>
-        <Button asChild disabled={!supplier.contactEmail} className="gap-2">
+        <Button asChild disabled={!supplier.contactEmail || !tpl} className="gap-2">
           <a href={mailtoHref}>
             <Mail className="h-4 w-4" /> Ouvrir dans Outlook
           </a>
