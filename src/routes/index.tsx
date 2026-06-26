@@ -18,6 +18,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useSuppliers, useDomains, domainColor, type Supplier } from "@/lib/suppliers-store";
 import { SupplierForm } from "@/components/supplier-form";
 import { EmailGenerator } from "@/components/email-generator";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -78,6 +79,7 @@ function Index() {
             <Button onClick={openNew} className="gap-2">
               <Plus className="h-4 w-4" /> Nouveau fournisseur
             </Button>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -111,12 +113,12 @@ function Index() {
           <Table>
             <TableHeader>
               <TableRow className="border-b-2 border-border bg-secondary/60 hover:bg-secondary/60">
-                <TableHead className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground">Fournisseur</TableHead>
-                <TableHead className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground">Domaine</TableHead>
-                <TableHead className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground">Liens</TableHead>
-                <TableHead className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground">Contact</TableHead>
-                <TableHead className="max-w-[280px] px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground">Notes</TableHead>
-                <TableHead className="w-[160px] px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-foreground">Actions</TableHead>
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Fournisseur</TableHead>
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Domaine</TableHead>
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Liens</TableHead>
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Contact</TableHead>
+                <TableHead className="max-w-[280px] px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Notes</TableHead>
+                <TableHead className="w-[160px] px-6 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -129,15 +131,16 @@ function Index() {
               ) : filtered.map((s) => (
                 <TableRow
                   key={s.id}
-                  className="group border-b border-border/70 transition-colors hover:bg-accent/40 data-[state=selected]:bg-accent/50"
+                  className="group border-b border-border/70 odd:bg-card even:bg-muted/40 transition-colors hover:!bg-accent/50 data-[state=selected]:bg-accent/50"
                 >
-                  <TableCell className="px-6 py-4 align-middle">
+
+                  <TableCell className="px-6 py-5 align-middle">
                     <span className="text-[15px] font-semibold tracking-tight text-foreground">{s.name}</span>
                   </TableCell>
-                  <TableCell className="px-6 py-4 align-middle">
+                  <TableCell className="px-6 py-5 align-middle">
                     <Badge variant="outline" className={`border ${domainColor(s.domain)} px-2.5 py-0.5 text-xs font-semibold shadow-sm`}>{s.domain}</Badge>
                   </TableCell>
-                  <TableCell className="px-6 py-4 align-middle">
+                  <TableCell className="px-6 py-5 align-middle">
                     <div className="flex flex-col gap-1">
                       {s.website && (
                         <a href={s.website} target="_blank" rel="noreferrer"
@@ -153,7 +156,7 @@ function Index() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="px-6 py-4 align-middle">
+                  <TableCell className="px-6 py-5 align-middle">
                     <div className="space-y-0.5 text-sm">
                       {s.contactName && <div className="font-medium text-foreground">{s.contactName}</div>}
                       {s.contactEmail && (
@@ -168,10 +171,10 @@ function Index() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="max-w-[280px] px-6 py-4 align-middle">
+                  <TableCell className="max-w-[280px] px-6 py-5 align-middle">
                     <p className="line-clamp-2 text-sm text-muted-foreground">{s.notes}</p>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-right align-middle">
+                  <TableCell className="px-6 py-5 text-right align-middle">
                     <div className="flex justify-end gap-1 opacity-80 transition-opacity group-hover:opacity-100">
                       <Button size="icon" variant="ghost" onClick={() => setMailFor(s)} aria-label="Générer un mail" title="Générer un mail">
                         <MailPlus className="h-4 w-4" />
