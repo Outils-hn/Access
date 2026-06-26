@@ -1,16 +1,32 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Search, Pencil, Trash2, ExternalLink, Box, Mail, Phone, Building2, MailPlus, Settings } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Pencil,
+  Trash2,
+  ExternalLink,
+  Box,
+  Mail,
+  Phone,
+  Building2,
+  MailPlus,
+  Settings,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -23,10 +39,13 @@ import { ThemeToggle } from "@/components/theme-toggle";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Annuaire fournisseurs — Façade" },
+      { title: "Access ·" },
       { name: "description", content: "Gestion des fournisseurs pour dessinateur-projeteur en façade." },
       { property: "og:title", content: "Annuaire fournisseurs — Façade" },
-      { property: "og:description", content: "Annuaire interne des fournisseurs façade : aluminium, vitrage, ancrages, panneaux." },
+      {
+        property: "og:description",
+        content: "Annuaire interne des fournisseurs façade : aluminium, vitrage, ancrages, panneaux.",
+      },
     ],
   }),
   component: Index,
@@ -56,8 +75,14 @@ function Index() {
     });
   }, [suppliers, query, domainFilter]);
 
-  const openNew = () => { setEditing(null); setOpen(true); };
-  const openEdit = (s: Supplier) => { setEditing(s); setOpen(true); };
+  const openNew = () => {
+    setEditing(null);
+    setOpen(true);
+  };
+  const openEdit = (s: Supplier) => {
+    setEditing(s);
+    setOpen(true);
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -74,7 +99,9 @@ function Index() {
           </div>
           <div className="flex items-center gap-2">
             <Button asChild variant="outline" className="gap-2">
-              <Link to="/configuration"><Settings className="h-4 w-4" /> Configuration</Link>
+              <Link to="/configuration">
+                <Settings className="h-4 w-4" /> Configuration
+              </Link>
             </Button>
             <Button onClick={openNew} className="gap-2">
               <Plus className="h-4 w-4" /> Nouveau fournisseur
@@ -101,7 +128,11 @@ function Index() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tous les domaines</SelectItem>
-              {domains.map((d) => <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>)}
+              {domains.map((d) => (
+                <SelectItem key={d.id} value={d.name}>
+                  {d.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Badge variant="secondary" className="ml-auto">
@@ -113,12 +144,24 @@ function Index() {
           <Table>
             <TableHeader>
               <TableRow className="border-b-2 border-border bg-secondary/60 hover:bg-secondary/60">
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Fournisseur</TableHead>
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Domaine</TableHead>
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Liens</TableHead>
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Contact</TableHead>
-                <TableHead className="max-w-[280px] px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Notes</TableHead>
-                <TableHead className="w-[160px] px-6 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">Actions</TableHead>
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Fournisseur
+                </TableHead>
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Domaine
+                </TableHead>
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Liens
+                </TableHead>
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Contact
+                </TableHead>
+                <TableHead className="max-w-[280px] px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Notes
+                </TableHead>
+                <TableHead className="w-[160px] px-6 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -128,68 +171,101 @@ function Index() {
                     Aucun fournisseur trouvé.
                   </TableCell>
                 </TableRow>
-              ) : filtered.map((s) => (
-                <TableRow
-                  key={s.id}
-                  className="group border-b border-border/70 odd:bg-card even:bg-muted/40 transition-colors hover:!bg-accent/50 data-[state=selected]:bg-accent/50"
-                >
-
-                  <TableCell className="px-6 py-5 align-middle">
-                    <span className="text-[15px] font-semibold tracking-tight text-foreground">{s.name}</span>
-                  </TableCell>
-                  <TableCell className="px-6 py-5 align-middle">
-                    <Badge variant="outline" className={`border ${domainColor(s.domain)} px-2.5 py-0.5 text-xs font-semibold shadow-sm`}>{s.domain}</Badge>
-                  </TableCell>
-                  <TableCell className="px-6 py-5 align-middle">
-                    <div className="flex flex-col gap-1">
-                      {s.website && (
-                        <a href={s.website} target="_blank" rel="noreferrer"
-                           className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline">
-                          <ExternalLink className="h-3.5 w-3.5" /> Site web
-                        </a>
-                      )}
-                      {s.cadWebsite && (
-                        <a href={s.cadWebsite} target="_blank" rel="noreferrer"
-                           className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline">
-                          <Box className="h-3.5 w-3.5" /> CAO / BIM
-                        </a>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-6 py-5 align-middle">
-                    <div className="space-y-0.5 text-sm">
-                      {s.contactName && <div className="font-medium text-foreground">{s.contactName}</div>}
-                      {s.contactEmail && (
-                        <a href={`mailto:${s.contactEmail}`} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary">
-                          <Mail className="h-3 w-3" />{s.contactEmail}
-                        </a>
-                      )}
-                      {s.contactPhone && (
-                        <a href={`tel:${s.contactPhone}`} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary">
-                          <Phone className="h-3 w-3" />{s.contactPhone}
-                        </a>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="max-w-[280px] px-6 py-5 align-middle">
-                    <p className="line-clamp-2 text-sm text-muted-foreground">{s.notes}</p>
-                  </TableCell>
-                  <TableCell className="px-6 py-5 text-right align-middle">
-                    <div className="flex justify-end gap-1 opacity-80 transition-opacity group-hover:opacity-100">
-                      <Button size="icon" variant="ghost" onClick={() => setMailFor(s)} aria-label="Générer un mail" title="Générer un mail">
-                        <MailPlus className="h-4 w-4" />
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={() => openEdit(s)} aria-label="Modifier">
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={() => setToDelete(s)} aria-label="Supprimer"
-                              className="text-destructive hover:text-destructive">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              ) : (
+                filtered.map((s) => (
+                  <TableRow
+                    key={s.id}
+                    className="group border-b border-border/70 odd:bg-card even:bg-muted/40 transition-colors hover:!bg-accent/50 data-[state=selected]:bg-accent/50"
+                  >
+                    <TableCell className="px-6 py-5 align-middle">
+                      <span className="text-[15px] font-semibold tracking-tight text-foreground">{s.name}</span>
+                    </TableCell>
+                    <TableCell className="px-6 py-5 align-middle">
+                      <Badge
+                        variant="outline"
+                        className={`border ${domainColor(s.domain)} px-2.5 py-0.5 text-xs font-semibold shadow-sm`}
+                      >
+                        {s.domain}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="px-6 py-5 align-middle">
+                      <div className="flex flex-col gap-1">
+                        {s.website && (
+                          <a
+                            href={s.website}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                          >
+                            <ExternalLink className="h-3.5 w-3.5" /> Site web
+                          </a>
+                        )}
+                        {s.cadWebsite && (
+                          <a
+                            href={s.cadWebsite}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                          >
+                            <Box className="h-3.5 w-3.5" /> CAO / BIM
+                          </a>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-5 align-middle">
+                      <div className="space-y-0.5 text-sm">
+                        {s.contactName && <div className="font-medium text-foreground">{s.contactName}</div>}
+                        {s.contactEmail && (
+                          <a
+                            href={`mailto:${s.contactEmail}`}
+                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+                          >
+                            <Mail className="h-3 w-3" />
+                            {s.contactEmail}
+                          </a>
+                        )}
+                        {s.contactPhone && (
+                          <a
+                            href={`tel:${s.contactPhone}`}
+                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+                          >
+                            <Phone className="h-3 w-3" />
+                            {s.contactPhone}
+                          </a>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="max-w-[280px] px-6 py-5 align-middle">
+                      <p className="line-clamp-2 text-sm text-muted-foreground">{s.notes}</p>
+                    </TableCell>
+                    <TableCell className="px-6 py-5 text-right align-middle">
+                      <div className="flex justify-end gap-1 opacity-80 transition-opacity group-hover:opacity-100">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setMailFor(s)}
+                          aria-label="Générer un mail"
+                          title="Générer un mail"
+                        >
+                          <MailPlus className="h-4 w-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => openEdit(s)} aria-label="Modifier">
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setToDelete(s)}
+                          aria-label="Supprimer"
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
@@ -199,13 +275,14 @@ function Index() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>{editing ? "Modifier le fournisseur" : "Nouveau fournisseur"}</DialogTitle>
-            <DialogDescription>
-              Renseignez les informations utiles à votre annuaire technique.
-            </DialogDescription>
+            <DialogDescription>Renseignez les informations utiles à votre annuaire technique.</DialogDescription>
           </DialogHeader>
           <SupplierForm
             initial={editing}
-            onSubmit={async (s) => { await upsert(s); setOpen(false); }}
+            onSubmit={async (s) => {
+              await upsert(s);
+              setOpen(false);
+            }}
             onCancel={() => setOpen(false)}
           />
         </DialogContent>
@@ -215,14 +292,15 @@ function Index() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Supprimer ce fournisseur ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {toDelete?.name} sera définitivement retiré de l'annuaire.
-            </AlertDialogDescription>
+            <AlertDialogDescription>{toDelete?.name} sera définitivement retiré de l'annuaire.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => { if (toDelete) remove(toDelete.id); setToDelete(null); }}
+              onClick={() => {
+                if (toDelete) remove(toDelete.id);
+                setToDelete(null);
+              }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Supprimer
