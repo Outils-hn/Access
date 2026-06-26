@@ -18,6 +18,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useSuppliers, useDomains, domainColor, type Supplier } from "@/lib/suppliers-store";
 import { SupplierForm } from "@/components/supplier-form";
 import { EmailGenerator } from "@/components/email-generator";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -78,6 +79,7 @@ function Index() {
             <Button onClick={openNew} className="gap-2">
               <Plus className="h-4 w-4" /> Nouveau fournisseur
             </Button>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -129,8 +131,9 @@ function Index() {
               ) : filtered.map((s) => (
                 <TableRow
                   key={s.id}
-                  className="group border-b border-border/70 transition-colors hover:bg-accent/40 data-[state=selected]:bg-accent/50"
+                  className="group border-b border-border/70 odd:bg-card even:bg-muted/40 transition-colors hover:!bg-accent/50 data-[state=selected]:bg-accent/50"
                 >
+
                   <TableCell className="px-6 py-4 align-middle">
                     <span className="text-[15px] font-semibold tracking-tight text-foreground">{s.name}</span>
                   </TableCell>
