@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowLeft, Plus, Trash2, Pencil, Tags, Mail, Save, X } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Plus, Trash2, Pencil, Tags, Mail, Save, X, Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,9 +17,10 @@ import {
 } from "@/components/ui/dialog";
 
 import {
-  useDomains, useEmailTemplates, domainColor,
+  useDomains, useEmailTemplates, domainBadgeClass, DOMAIN_COLOR_PRESETS,
   type Domain, type EmailTemplate,
 } from "@/lib/suppliers-store";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/configuration")({
   head: () => ({
@@ -32,6 +33,21 @@ export const Route = createFileRoute("/configuration")({
 });
 
 function ConfigurationPage() {
+  const { isAdmin, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !isAdmin) navigate({ to: "/auth" });
+  }, [loading, isAdmin, navigate]);
+
+  if (!isAdmin) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-6">
+        <p className="text-sm text-muted-foreground">Connexion requise…</p>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/60 backdrop-blur">
@@ -61,45 +77,43 @@ function ConfigurationPage() {
 }
 
 function DomainsManager() {
-  const { domains, add, remove } = useDomains();
+  const { domains, add, update, remove } = useDomains();
   const [name, setName] = useState("");
+  const [color, setColor] = useState<string>("sky");
   const [toDelete, setToDelete] = useState<Domain | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    await add(name);
+    await add(name, color);
     setName("");
   };
 
   return (
     <div className="space-y-6">
-      <form onSubmit={submit} className="flex gap-2 rounded-xl border border-border bg-card p-4">
-        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nouveau domaine (ex: Garde-corps)" />
+      <form onSubmit={submit} className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-card p-4">
+        <div className="flex-1 min-w-[200px] space-y-1.5">
+          <Label htmlFor="dom-name">Nouveau domaine</Label>
+          <Input id="dom-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Garde-corps" />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Couleur</Label>
+          <ColorPicker value={color} onChange={setColor} />
+        </div>
         <Button type="submit" className="gap-2" disabled={!name.trim()}>
           <Plus className="h-4 w-4" /> Ajouter
         </Button>
       </form>
 
-      <div className="rounded-xl border border-border bg-card p-4">
+      <div className="space-y-2 rounded-xl border border-border bg-card p-4">
         {domains.length === 0 ? (
           <p className="py-8 text-center text-sm text-muted-foreground">Aucun domaine défini.</p>
         ) : (
-          <div className="flex flex-wrap gap-2">
-            {domains.map((d) => (
-              <div key={d.id} className="group flex items-center gap-2 rounded-md border border-border bg-muted/30 px-3 py-1.5">
-                <Badge variant="outline" className={`border ${domainColor(d.name)}`}>{d.name}</Badge>
-                <button
-                  type="button"
-                  onClick={() => setToDelete(d)}
-                  className="text-muted-foreground transition-colors hover:text-destructive"
-                  aria-label={`Supprimer ${d.name}`}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            ))}
-          </div>
+          domains.map((d) => (
+            <DomainRow key={d.id} domain={d}
+              onUpdate={(patch) => update(d.id, patch)}
+              onDelete={() => setToDelete(d)} />
+          ))
         )}
       </div>
 
@@ -116,12 +130,65 @@ function DomainsManager() {
             <AlertDialogAction
               onClick={() => { if (toDelete) remove(toDelete.id); setToDelete(null); }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Supprimer
-            </AlertDialogAction>
+            >Supprimer</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+}
+
+function DomainRow({ domain, onUpdate, onDelete }: {
+  domain: Domain;
+  onUpdate: (patch: Partial<Pick<Domain, "name" | "color">>) => void | Promise<void>;
+  onDelete: () => void;
+}) {
+  const [name, setName] = useState(domain.name);
+  const [color, setColor] = useState<string>(domain.color ?? "sky");
+  const dirty = name !== domain.name || color !== (domain.color ?? "sky");
+
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-md border border-border bg-muted/20 p-3">
+      <Badge variant="outline"
+             className={`border ${domainBadgeClass({ name, color })} px-3 py-1 text-xs font-semibold`}>
+        {name || "—"}
+      </Badge>
+      <Input value={name} onChange={(e) => setName(e.target.value)} className="w-48" />
+      <ColorPicker value={color} onChange={setColor} />
+      <div className="ml-auto flex gap-1">
+        {dirty && (
+          <Button size="sm" variant="default" className="gap-1"
+                  onClick={() => onUpdate({ name: name.trim(), color })}>
+            <Check className="h-4 w-4" /> Enregistrer
+          </Button>
+        )}
+        <Button size="icon" variant="ghost" onClick={onDelete}
+                className="text-destructive hover:text-destructive" aria-label="Supprimer">
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function ColorPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {DOMAIN_COLOR_PRESETS.map((p) => {
+        const selected = p.value === value;
+        return (
+          <button
+            key={p.value}
+            type="button"
+            onClick={() => onChange(p.value)}
+            title={p.name}
+            aria-label={p.name}
+            className={`h-7 w-7 rounded-full border-2 transition-transform ${p.className} ${
+              selected ? "ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110" : "opacity-80 hover:opacity-100"
+            }`}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -139,7 +206,7 @@ function TemplatesManager() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Utilisez les variables <code>{"{numero_chantier}"}</code>, <code>{"{nom_chantier}"}</code>, <code>{"{numero_tache}"}</code>, <code>{"{nom_fournisseur}"}</code>, <code>{"{nom_contact}"}</code>.
+          Variables : <code>{"{numero_chantier}"}</code>, <code>{"{nom_chantier}"}</code>, <code>{"{numero_tache}"}</code>, <code>{"{nom_fournisseur}"}</code>, <code>{"{nom_contact}"}</code>.
         </p>
         <Button onClick={startNew} className="gap-2"><Plus className="h-4 w-4" /> Nouveau modèle</Button>
       </div>
@@ -171,12 +238,16 @@ function TemplatesManager() {
         ))}
       </div>
 
-      <TemplateEditor
-        open={open}
-        onOpenChange={setOpen}
-        initial={editing}
-        onSave={async (t) => { await upsert(t); setOpen(false); }}
-      />
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl">
+          <TemplateEditorBody
+            key={editing?.id ?? "new"}
+            initial={editing}
+            onSave={async (t) => { await upsert(t); setOpen(false); }}
+            onCancel={() => setOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
         <AlertDialogContent>
@@ -189,9 +260,7 @@ function TemplatesManager() {
             <AlertDialogAction
               onClick={() => { if (toDelete) remove(toDelete.id); setToDelete(null); }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Supprimer
-            </AlertDialogAction>
+            >Supprimer</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -199,31 +268,7 @@ function TemplatesManager() {
   );
 }
 
-function TemplateEditor({
-  open, onOpenChange, initial, onSave,
-}: {
-  open: boolean;
-  onOpenChange: (o: boolean) => void;
-  initial: EmailTemplate | null;
-  onSave: (t: { id?: string; title: string; subject: string; body: string }) => void;
-}) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <TemplateEditorBody
-          key={initial?.id ?? "new"}
-          initial={initial}
-          onSave={onSave}
-          onCancel={() => onOpenChange(false)}
-        />
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function TemplateEditorBody({
-  initial, onSave, onCancel,
-}: {
+function TemplateEditorBody({ initial, onSave, onCancel }: {
   initial: EmailTemplate | null;
   onSave: (t: { id?: string; title: string; subject: string; body: string }) => void;
   onCancel: () => void;
@@ -255,15 +300,9 @@ function TemplateEditorBody({
         </div>
       </div>
       <DialogFooter>
-        <Button type="button" variant="ghost" onClick={onCancel} className="gap-2">
-          <X className="h-4 w-4" /> Annuler
-        </Button>
-        <Button
-          type="button"
-          disabled={!title.trim()}
-          onClick={() => onSave({ id: initial?.id, title: title.trim(), subject, body })}
-          className="gap-2"
-        >
+        <Button type="button" variant="ghost" onClick={onCancel} className="gap-2"><X className="h-4 w-4" /> Annuler</Button>
+        <Button type="button" disabled={!title.trim()}
+                onClick={() => onSave({ id: initial?.id, title: title.trim(), subject, body })} className="gap-2">
           <Save className="h-4 w-4" /> Enregistrer
         </Button>
       </DialogFooter>
