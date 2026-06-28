@@ -16,16 +16,19 @@ export type Database = {
     Tables: {
       domains: {
         Row: {
+          color: string | null
           created_at: string
           id: string
           name: string
         }
         Insert: {
+          color?: string | null
           created_at?: string
           id?: string
           name: string
         }
         Update: {
+          color?: string | null
           created_at?: string
           id?: string
           name?: string
@@ -58,6 +61,35 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      supplier_secrets: {
+        Row: {
+          access_password: string
+          created_at: string
+          supplier_id: string
+          updated_at: string
+        }
+        Insert: {
+          access_password?: string
+          created_at?: string
+          supplier_id: string
+          updated_at?: string
+        }
+        Update: {
+          access_password?: string
+          created_at?: string
+          supplier_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_secrets_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: true
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       suppliers: {
         Row: {

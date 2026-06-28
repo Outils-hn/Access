@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,11 +11,12 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
-import { useDomains, type Supplier } from "@/lib/suppliers-store";
+import { useDomains, fetchSupplierSecret, type Supplier } from "@/lib/suppliers-store";
+import { useAuth } from "@/lib/auth-context";
 
 type Props = {
   initial?: Supplier | null;
-  onSubmit: (s: Supplier) => void;
+  onSubmit: (s: Supplier, accessPassword?: string | null) => void;
   onCancel: () => void;
 };
 
@@ -32,21 +33,35 @@ const empty: Supplier = {
 };
 
 export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
+  const { isAdmin } = useAuth();
   const { domains, add } = useDomains();
-  const [form, setForm] = useState<Supplier>(empty);
+  const [form, setForm] = useState<Supplier>(initial ?? empty);
+  const [accessPwd, setAccessPwd] = useState<string>("");
+  const [showPwd, setShowPwd] = useState(false);
   const [newDomainOpen, setNewDomainOpen] = useState(false);
   const [newDomain, setNewDomain] = useState("");
 
+  // Sync form on initial change
   useEffect(() => {
     setForm(initial ?? empty);
   }, [initial]);
 
-  // Preselect first domain when none set and list loaded
+  // Load access password for existing supplier (admin only)
   useEffect(() => {
+    if (initial?.id && isAdmin) {
+      fetchSupplierSecret(initial.id).then(setAccessPwd);
+    } else {
+      setAccessPwd("");
+    }
+  }, [initial?.id, isAdmin]);
+
+  // Preselect first domain ONLY when creating a new supplier and none set
+  useEffect(() => {
+    if (initial) return; // never override domain on edit
     if (!form.domain && domains.length > 0) {
       setForm((f) => ({ ...f, domain: domains[0].name }));
     }
-  }, [domains, form.domain]);
+  }, [domains, form.domain, initial]);
 
   const set = <K extends keyof Supplier>(k: K, v: Supplier[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -54,7 +69,7 @@ export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.domain) return;
-    onSubmit(form);
+    onSubmit(form, isAdmin ? accessPwd : undefined);
   };
 
   const createDomain = async () => {
@@ -76,9 +91,13 @@ export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
         <div className="space-y-2">
           <Label htmlFor="domain">Domaine *</Label>
           <div className="flex gap-2">
-            <Select value={form.domain} onValueChange={(v) => set("domain", v)}>
+            <Select value={form.domain || undefined} onValueChange={(v) => set("domain", v)}>
               <SelectTrigger id="domain" className="flex-1"><SelectValue placeholder="Choisir un domaine" /></SelectTrigger>
               <SelectContent>
+                {/* Ensure current value is selectable even if missing from list */}
+                {form.domain && !domains.some((d) => d.name === form.domain) && (
+                  <SelectItem value={form.domain}>{form.domain}</SelectItem>
+                )}
                 {domains.map((d) => <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -114,6 +133,34 @@ export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
           </div>
         </div>
       </div>
+
+      {isAdmin && (
+        <div className="space-y-2 rounded-lg border border-border bg-muted/30 p-4">
+          <Label htmlFor="access-pwd" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Accès / Mot de passe du site fournisseur
+          </Label>
+          <div className="relative">
+            <Input
+              id="access-pwd"
+              type={showPwd ? "text" : "password"}
+              value={accessPwd}
+              onChange={(e) => setAccessPwd(e.target.value)}
+              placeholder="Mot de passe d'accès au shop/extranet"
+              autoComplete="new-password"
+              className="pr-10 font-mono"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPwd((v) => !v)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
+              aria-label={showPwd ? "Masquer" : "Afficher"}
+            >
+              {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+          <p className="text-[11px] text-muted-foreground">Visible uniquement par les administrateurs connectés.</p>
+        </div>
+      )}
 
       <div className="space-y-2">
         <Label htmlFor="notes">Notes / Remarques</Label>
