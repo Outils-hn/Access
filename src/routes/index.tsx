@@ -211,10 +211,10 @@ function Index() {
                     key={s.id}
                     className="group border-b border-border/70 odd:bg-card even:bg-muted/40 transition-colors hover:!bg-accent/50"
                   >
-                    <TableCell className="whitespace-nowrap px-6 py-5 align-middle">
+                    <TableCell className="whitespace-nowrap px-4 py-5 align-middle">
                       <span className="text-[15px] font-semibold tracking-tight text-foreground">{s.name}</span>
                     </TableCell>
-                    <TableCell className="whitespace-nowrap px-6 py-5 align-middle">
+                    <TableCell className="whitespace-nowrap px-4 py-5 align-middle">
                       <Badge
                         variant="outline"
                         className={`inline-flex whitespace-nowrap border ${domainBadgeClass(s.domain, domains)} px-2.5 py-0.5 text-xs font-semibold shadow-sm`}
@@ -222,7 +222,7 @@ function Index() {
                         {s.domain}
                       </Badge>
                     </TableCell>
-                    <TableCell className="whitespace-nowrap px-6 py-5 align-middle">
+                    <TableCell className="whitespace-nowrap px-4 py-5 align-middle">
                       <div className="flex flex-col gap-1">
                         {s.website && (
                           <a
@@ -246,7 +246,7 @@ function Index() {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="whitespace-nowrap px-6 py-5 align-middle">
+                    <TableCell className="whitespace-nowrap px-4 py-5 align-middle">
                       <div className="space-y-0.5 text-sm">
                         {s.contactName && <div className="whitespace-nowrap font-medium text-foreground">{s.contactName}</div>}
                         {s.contactEmail && (
