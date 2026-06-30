@@ -87,7 +87,7 @@ function Index() {
     setOpen(true);
   };
 
-  const colCount = isAdmin ? 7 : 6;
+  
 
   return (
     <main className="min-h-screen bg-background">
