@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { useDomains, fetchSupplierSecret, type Supplier } from "@/lib/suppliers-store";
 import { useAuth } from "@/lib/auth-context";
@@ -63,8 +66,7 @@ export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
     }
   }, [domains, form.domain, initial]);
 
-  const set = <K extends keyof Supplier>(k: K, v: Supplier[K]) =>
-    setForm((f) => ({ ...f, [k]: v }));
+  const set = <K extends keyof Supplier>(k: K, v: Supplier[K]) => setForm((f) => ({ ...f, [k]: v }));
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,27 +94,51 @@ export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
           <Label htmlFor="domain">Domaine *</Label>
           <div className="flex gap-2">
             <Select value={form.domain || undefined} onValueChange={(v) => set("domain", v)}>
-              <SelectTrigger id="domain" className="flex-1"><SelectValue placeholder="Choisir un domaine" /></SelectTrigger>
+              <SelectTrigger id="domain" className="flex-1">
+                <SelectValue placeholder="Choisir un domaine" />
+              </SelectTrigger>
               <SelectContent>
                 {/* Ensure current value is selectable even if missing from list */}
                 {form.domain && !domains.some((d) => d.name === form.domain) && (
                   <SelectItem value={form.domain}>{form.domain}</SelectItem>
                 )}
-                {domains.map((d) => <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>)}
+                {domains.map((d) => (
+                  <SelectItem key={d.id} value={d.name}>
+                    {d.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            <Button type="button" size="icon" variant="outline" onClick={() => setNewDomainOpen(true)} title="Ajouter un domaine">
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              onClick={() => setNewDomainOpen(true)}
+              title="Ajouter un domaine"
+            >
               <Plus className="h-4 w-4" />
             </Button>
           </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="website">Site web principal</Label>
-          <Input id="website" type="url" placeholder="https://..." value={form.website} onChange={(e) => set("website", e.target.value)} />
+          <Input
+            id="website"
+            type="url"
+            placeholder="https://..."
+            value={form.website}
+            onChange={(e) => set("website", e.target.value)}
+          />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="cad">Site CAO / BIM</Label>
-          <Input id="cad" type="url" placeholder="https://..." value={form.cadWebsite ?? ""} onChange={(e) => set("cadWebsite", e.target.value)} />
+          <Label htmlFor="cad">Site CAO</Label>
+          <Input
+            id="cad"
+            type="url"
+            placeholder="https://..."
+            value={form.cadWebsite ?? ""}
+            onChange={(e) => set("cadWebsite", e.target.value)}
+          />
         </div>
       </div>
 
@@ -125,7 +151,12 @@ export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="ce">Email</Label>
-            <Input id="ce" type="email" value={form.contactEmail ?? ""} onChange={(e) => set("contactEmail", e.target.value)} />
+            <Input
+              id="ce"
+              type="email"
+              value={form.contactEmail ?? ""}
+              onChange={(e) => set("contactEmail", e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="cp">Téléphone</Label>
@@ -168,7 +199,9 @@ export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
       </div>
 
       <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="ghost" onClick={onCancel}>Annuler</Button>
+        <Button type="button" variant="ghost" onClick={onCancel}>
+          Annuler
+        </Button>
         <Button type="submit">{initial ? "Enregistrer" : "Ajouter"}</Button>
       </div>
 
@@ -182,12 +215,21 @@ export function SupplierForm({ initial, onSubmit, onCancel }: Props) {
             value={newDomain}
             onChange={(e) => setNewDomain(e.target.value)}
             placeholder="Ex: Garde-corps"
-            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); createDomain(); } }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                createDomain();
+              }
+            }}
             autoFocus
           />
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={() => setNewDomainOpen(false)}>Annuler</Button>
-            <Button type="button" onClick={createDomain} disabled={!newDomain.trim()}>Ajouter</Button>
+            <Button type="button" variant="ghost" onClick={() => setNewDomainOpen(false)}>
+              Annuler
+            </Button>
+            <Button type="button" onClick={createDomain} disabled={!newDomain.trim()}>
+              Ajouter
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
