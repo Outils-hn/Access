@@ -52,7 +52,7 @@ INSERT INTO public.email_templates (title, subject, body) VALUES
   E'Bonjour,\n\nDans le cadre de notre chantier n° {numero_chantier} — {nom_chantier} (Tâche {numero_tache}), nous étudions actuellement les solutions {nom_fournisseur} pour la partie façade.\n\nPourriez-vous nous transmettre :\n  • un devis détaillé selon les éléments en pièce jointe,\n  • les délais de fabrication et de livraison sur site,\n  • les conditions commerciales applicables.\n\nRestant à votre disposition pour tout complément technique,\n\nCordialement,'
 ),
 (
-  'Demande de fichiers CAO / BIM spécifiques',
+  'Demande de fichiers CAO spécifiques',
   'Demande de fichiers CAO/BIM — Chantier {numero_chantier} {nom_chantier} — Tâche {numero_tache}',
   E'Bonjour,\n\nDans le cadre du chantier n° {numero_chantier} — {nom_chantier} (Tâche {numero_tache}), nous intégrons actuellement les produits {nom_fournisseur} dans nos plans d''exécution façade.\n\nPourriez-vous nous fournir les ressources techniques suivantes :\n  • familles Revit / objets BIM des références retenues,\n  • blocs DWG 2D et 3D associés,\n  • fiches techniques et carnets de détails à jour.\n\nMerci par avance pour votre retour.\n\nCordialement,'
 );
