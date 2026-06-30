@@ -172,31 +172,31 @@ function Index() {
           </Badge>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl shadow-black/30">
-          <Table>
+        <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-xl shadow-black/30">
+          <Table className="w-full table-auto">
             <TableHeader>
               <TableRow className="border-b-2 border-border bg-secondary/60 hover:bg-secondary/60">
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[200px]">
                   Fournisseur
                 </TableHead>
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[140px]">
                   Domaine
                 </TableHead>
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[140px]">
                   Liens
                 </TableHead>
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[220px]">
                   Contact
                 </TableHead>
                 {isAdmin && (
-                  <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[180px]">
                     Accès
                   </TableHead>
                 )}
-                <TableHead className="max-w-[280px] px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground w-full min-w-[240px]">
                   Notes
                 </TableHead>
-                <TableHead className="w-[160px] px-6 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="whitespace-nowrap w-[160px] px-6 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">
                   Actions
                 </TableHead>
               </TableRow>
