@@ -12,8 +12,6 @@ import {
   Building2,
   MailPlus,
   Settings,
-  Eye,
-  EyeOff,
   LogIn,
   LogOut,
   ShieldCheck,
@@ -65,7 +63,6 @@ function Index() {
   const [editing, setEditing] = useState<Supplier | null>(null);
   const [toDelete, setToDelete] = useState<Supplier | null>(null);
   const [mailFor, setMailFor] = useState<Supplier | null>(null);
-  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -172,31 +169,31 @@ function Index() {
           </Badge>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl shadow-black/30">
-          <Table>
+        <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-xl shadow-black/30">
+          <Table className="w-full table-auto">
             <TableHeader>
               <TableRow className="border-b-2 border-border bg-secondary/60 hover:bg-secondary/60">
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[200px]">
                   Fournisseur
                 </TableHead>
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[140px]">
                   Domaine
                 </TableHead>
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[140px]">
                   Liens
                 </TableHead>
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[220px]">
                   Contact
                 </TableHead>
                 {isAdmin && (
-                  <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[180px]">
                     Accès
                   </TableHead>
                 )}
-                <TableHead className="max-w-[280px] px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground w-full min-w-[240px]">
                   Notes
                 </TableHead>
-                <TableHead className="w-[160px] px-6 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="whitespace-nowrap w-[160px] px-6 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">
                   Actions
                 </TableHead>
               </TableRow>
@@ -214,27 +211,27 @@ function Index() {
                     key={s.id}
                     className="group border-b border-border/70 odd:bg-card even:bg-muted/40 transition-colors hover:!bg-accent/50"
                   >
-                    <TableCell className="px-6 py-5 align-middle">
+                    <TableCell className="whitespace-nowrap px-6 py-5 align-middle">
                       <span className="text-[15px] font-semibold tracking-tight text-foreground">{s.name}</span>
                     </TableCell>
-                    <TableCell className="px-6 py-5 align-middle">
+                    <TableCell className="whitespace-nowrap px-6 py-5 align-middle">
                       <Badge
                         variant="outline"
-                        className={`border ${domainBadgeClass(s.domain, domains)} px-2.5 py-0.5 text-xs font-semibold shadow-sm`}
+                        className={`inline-flex whitespace-nowrap border ${domainBadgeClass(s.domain, domains)} px-2.5 py-0.5 text-xs font-semibold shadow-sm`}
                       >
                         {s.domain}
                       </Badge>
                     </TableCell>
-                    <TableCell className="px-6 py-5 align-middle">
+                    <TableCell className="whitespace-nowrap px-6 py-5 align-middle">
                       <div className="flex flex-col gap-1">
                         {s.website && (
                           <a
                             href={s.website}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                            className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm text-primary hover:underline"
                           >
-                            <ExternalLink className="h-3.5 w-3.5" /> Site web
+                            <ExternalLink className="h-3.5 w-3.5 shrink-0" /> Site web
                           </a>
                         )}
                         {s.cadWebsite && (
@@ -242,46 +239,48 @@ function Index() {
                             href={s.cadWebsite}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                            className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm text-primary hover:underline"
                           >
-                            <Box className="h-3.5 w-3.5" /> CAO
+                            <Box className="h-3.5 w-3.5 shrink-0" /> CAO
                           </a>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="px-6 py-5 align-middle">
+                    <TableCell className="whitespace-nowrap px-6 py-5 align-middle">
                       <div className="space-y-0.5 text-sm">
-                        {s.contactName && <div className="font-medium text-foreground">{s.contactName}</div>}
+                        {s.contactName && <div className="whitespace-nowrap font-medium text-foreground">{s.contactName}</div>}
                         {s.contactEmail && (
                           <a
                             href={`mailto:${s.contactEmail}`}
-                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+                            className="flex items-center gap-1 whitespace-nowrap text-xs text-muted-foreground hover:text-primary"
                           >
-                            <Mail className="h-3 w-3" />
+                            <Mail className="h-3 w-3 shrink-0" />
                             {s.contactEmail}
                           </a>
                         )}
                         {s.contactPhone && (
                           <a
                             href={`tel:${s.contactPhone}`}
-                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+                            className="flex items-center gap-1 whitespace-nowrap text-xs text-muted-foreground hover:text-primary"
                           >
-                            <Phone className="h-3 w-3" />
+                            <Phone className="h-3 w-3 shrink-0" />
                             {s.contactPhone}
                           </a>
                         )}
                       </div>
                     </TableCell>
                     {isAdmin && (
-                      <TableCell className="px-6 py-5 align-middle">
-                        <AccessCell
-                          value={secrets[s.id] ?? ""}
-                          revealed={!!revealed[s.id]}
-                          onToggle={() => setRevealed((r) => ({ ...r, [s.id]: !r[s.id] }))}
-                        />
+                      <TableCell className="whitespace-nowrap px-6 py-5 align-middle">
+                        {secrets[s.id] ? (
+                          <code className="rounded bg-muted px-2 py-1 font-mono text-xs text-foreground">
+                            {secrets[s.id]}
+                          </code>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                     )}
-                    <TableCell className="max-w-[280px] px-6 py-5 align-middle">
+                    <TableCell className="px-6 py-5 align-middle">
                       <p className="line-clamp-2 text-sm text-muted-foreground">{s.notes}</p>
                     </TableCell>
                     <TableCell className="px-6 py-5 text-right align-middle">
@@ -382,21 +381,3 @@ function Index() {
   );
 }
 
-function AccessCell({ value, revealed, onToggle }: { value: string; revealed: boolean; onToggle: () => void }) {
-  if (!value) return <span className="text-xs text-muted-foreground">—</span>;
-  return (
-    <div className="flex items-center gap-2">
-      <code className="rounded bg-muted px-2 py-1 font-mono text-xs text-foreground">
-        {revealed ? value : "••••••••"}
-      </code>
-      <button
-        type="button"
-        onClick={onToggle}
-        className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-        aria-label={revealed ? "Masquer" : "Afficher"}
-      >
-        {revealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-      </button>
-    </div>
-  );
-}
