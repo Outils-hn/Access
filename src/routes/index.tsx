@@ -169,7 +169,7 @@ function Index() {
           </Badge>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-xl shadow-black/30">
+        <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xl shadow-black/30">
           <Table className="w-full table-auto">
             <TableHeader>
               <TableRow className="border-b-2 border-border bg-secondary/60 hover:bg-secondary/60">
@@ -190,7 +190,7 @@ function Index() {
                     Accès
                   </TableHead>
                 )}
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground w-full min-w-[240px]">
+                <TableHead className="min-w-[200px] max-w-[400px] whitespace-normal break-words px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                   Notes
                 </TableHead>
                 <TableHead className="whitespace-nowrap w-[160px] px-6 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">
@@ -280,7 +280,7 @@ function Index() {
                         )}
                       </TableCell>
                     )}
-                    <TableCell className="whitespace-normal px-6 py-5 align-middle min-w-[280px]">
+                    <TableCell className="min-w-[200px] max-w-[400px] whitespace-normal break-words px-6 py-5 align-middle">
                       <p className="line-clamp-2 break-words text-sm text-muted-foreground">{s.notes}</p>
                     </TableCell>
                     <TableCell className="px-6 py-5 text-right align-middle">
