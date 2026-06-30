@@ -1,8 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  Plus, Search, Pencil, Trash2, ExternalLink, Box, Mail, Phone,
-  Building2, MailPlus, Settings, Eye, EyeOff, LogIn, LogOut, ShieldCheck,
+  Plus,
+  Search,
+  Pencil,
+  Trash2,
+  ExternalLink,
+  Box,
+  Mail,
+  Phone,
+  Building2,
+  MailPlus,
+  Settings,
+  Eye,
+  EyeOff,
+  LogIn,
+  LogOut,
+  ShieldCheck,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -10,8 +24,14 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -61,8 +81,14 @@ function Index() {
     });
   }, [suppliers, query, domainFilter]);
 
-  const openNew = () => { setEditing(null); setOpen(true); };
-  const openEdit = (s: Supplier) => { setEditing(s); setOpen(true); };
+  const openNew = () => {
+    setEditing(null);
+    setOpen(true);
+  };
+  const openEdit = (s: Supplier) => {
+    setEditing(s);
+    setOpen(true);
+  };
 
   const colCount = isAdmin ? 7 : 6;
 
@@ -85,7 +111,9 @@ function Index() {
             {isAdmin && (
               <>
                 <Button asChild variant="outline" className="gap-2">
-                  <Link to="/configuration"><Settings className="h-4 w-4" /> Configuration</Link>
+                  <Link to="/configuration">
+                    <Settings className="h-4 w-4" /> Configuration
+                  </Link>
                 </Button>
                 <Button onClick={openNew} className="gap-2">
                   <Plus className="h-4 w-4" /> Nouveau fournisseur
@@ -98,7 +126,9 @@ function Index() {
               </Button>
             ) : (
               <Button asChild variant="default" className="gap-2">
-                <Link to="/auth"><LogIn className="h-4 w-4" /> Connexion admin</Link>
+                <Link to="/auth">
+                  <LogIn className="h-4 w-4" /> Connexion admin
+                </Link>
               </Button>
             )}
             <ThemeToggle />
@@ -125,11 +155,15 @@ function Index() {
             />
           </div>
           <Select value={domainFilter} onValueChange={setDomainFilter}>
-            <SelectTrigger className="w-[220px]"><SelectValue placeholder="Filtrer par domaine" /></SelectTrigger>
+            <SelectTrigger className="w-[220px]">
+              <SelectValue placeholder="Filtrer par domaine" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tous les domaines</SelectItem>
               {domains.map((d) => (
-                <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>
+                <SelectItem key={d.id} value={d.name}>
+                  {d.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -142,15 +176,29 @@ function Index() {
           <Table>
             <TableHeader>
               <TableRow className="border-b-2 border-border bg-secondary/60 hover:bg-secondary/60">
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Fournisseur</TableHead>
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Domaine</TableHead>
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Liens</TableHead>
-                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Contact</TableHead>
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Fournisseur
+                </TableHead>
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Domaine
+                </TableHead>
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Liens
+                </TableHead>
+                <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Contact
+                </TableHead>
                 {isAdmin && (
-                  <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Accès</TableHead>
+                  <TableHead className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                    Accès
+                  </TableHead>
                 )}
-                <TableHead className="max-w-[280px] px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">Notes</TableHead>
-                <TableHead className="w-[160px] px-6 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">Actions</TableHead>
+                <TableHead className="max-w-[280px] px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Notes
+                </TableHead>
+                <TableHead className="w-[160px] px-6 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -180,15 +228,23 @@ function Index() {
                     <TableCell className="px-6 py-5 align-middle">
                       <div className="flex flex-col gap-1">
                         {s.website && (
-                          <a href={s.website} target="_blank" rel="noreferrer"
-                             className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline">
+                          <a
+                            href={s.website}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                          >
                             <ExternalLink className="h-3.5 w-3.5" /> Site web
                           </a>
                         )}
                         {s.cadWebsite && (
-                          <a href={s.cadWebsite} target="_blank" rel="noreferrer"
-                             className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline">
-                            <Box className="h-3.5 w-3.5" /> CAO / BIM
+                          <a
+                            href={s.cadWebsite}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                          >
+                            <Box className="h-3.5 w-3.5" /> CAO
                           </a>
                         )}
                       </div>
@@ -197,23 +253,32 @@ function Index() {
                       <div className="space-y-0.5 text-sm">
                         {s.contactName && <div className="font-medium text-foreground">{s.contactName}</div>}
                         {s.contactEmail && (
-                          <a href={`mailto:${s.contactEmail}`}
-                             className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary">
-                            <Mail className="h-3 w-3" />{s.contactEmail}
+                          <a
+                            href={`mailto:${s.contactEmail}`}
+                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+                          >
+                            <Mail className="h-3 w-3" />
+                            {s.contactEmail}
                           </a>
                         )}
                         {s.contactPhone && (
-                          <a href={`tel:${s.contactPhone}`}
-                             className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary">
-                            <Phone className="h-3 w-3" />{s.contactPhone}
+                          <a
+                            href={`tel:${s.contactPhone}`}
+                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+                          >
+                            <Phone className="h-3 w-3" />
+                            {s.contactPhone}
                           </a>
                         )}
                       </div>
                     </TableCell>
                     {isAdmin && (
                       <TableCell className="px-6 py-5 align-middle">
-                        <AccessCell value={secrets[s.id] ?? ""} revealed={!!revealed[s.id]}
-                                    onToggle={() => setRevealed((r) => ({ ...r, [s.id]: !r[s.id] }))} />
+                        <AccessCell
+                          value={secrets[s.id] ?? ""}
+                          revealed={!!revealed[s.id]}
+                          onToggle={() => setRevealed((r) => ({ ...r, [s.id]: !r[s.id] }))}
+                        />
                       </TableCell>
                     )}
                     <TableCell className="max-w-[280px] px-6 py-5 align-middle">
@@ -221,8 +286,13 @@ function Index() {
                     </TableCell>
                     <TableCell className="px-6 py-5 text-right align-middle">
                       <div className="flex justify-end gap-1 opacity-80 transition-opacity group-hover:opacity-100">
-                        <Button size="icon" variant="ghost" onClick={() => setMailFor(s)}
-                                aria-label="Générer un mail" title="Générer un mail">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setMailFor(s)}
+                          aria-label="Générer un mail"
+                          title="Générer un mail"
+                        >
                           <MailPlus className="h-4 w-4" />
                         </Button>
                         {isAdmin && (
@@ -230,8 +300,13 @@ function Index() {
                             <Button size="icon" variant="ghost" onClick={() => openEdit(s)} aria-label="Modifier">
                               <Pencil className="h-4 w-4" />
                             </Button>
-                            <Button size="icon" variant="ghost" onClick={() => setToDelete(s)}
-                                    aria-label="Supprimer" className="text-destructive hover:text-destructive">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => setToDelete(s)}
+                              aria-label="Supprimer"
+                              className="text-destructive hover:text-destructive"
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </>
@@ -272,12 +347,17 @@ function Index() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Supprimer ce fournisseur ?</AlertDialogTitle>
-              <AlertDialogDescription>{toDelete?.name} sera définitivement retiré de l'annuaire.</AlertDialogDescription>
+              <AlertDialogDescription>
+                {toDelete?.name} sera définitivement retiré de l'annuaire.
+              </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Annuler</AlertDialogCancel>
               <AlertDialogAction
-                onClick={() => { if (toDelete) remove(toDelete.id); setToDelete(null); }}
+                onClick={() => {
+                  if (toDelete) remove(toDelete.id);
+                  setToDelete(null);
+                }}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
                 Supprimer
@@ -309,9 +389,12 @@ function AccessCell({ value, revealed, onToggle }: { value: string; revealed: bo
       <code className="rounded bg-muted px-2 py-1 font-mono text-xs text-foreground">
         {revealed ? value : "••••••••"}
       </code>
-      <button type="button" onClick={onToggle}
-              className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-              aria-label={revealed ? "Masquer" : "Afficher"}>
+      <button
+        type="button"
+        onClick={onToggle}
+        className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        aria-label={revealed ? "Masquer" : "Afficher"}
+      >
         {revealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
       </button>
     </div>
