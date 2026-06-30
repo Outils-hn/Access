@@ -270,9 +270,9 @@ function Index() {
                       </div>
                     </TableCell>
                     {isAdmin && (
-                      <TableCell className="whitespace-nowrap px-6 py-5 align-middle">
+                      <TableCell className="px-4 py-5 align-middle">
                         {secrets[s.id] ? (
-                          <code className="rounded bg-muted px-2 py-1 font-mono text-xs text-foreground">
+                          <code className="block truncate rounded bg-muted px-2 py-1 font-mono text-xs text-foreground" title={secrets[s.id]}>
                             {secrets[s.id]}
                           </code>
                         ) : (
@@ -280,10 +280,10 @@ function Index() {
                         )}
                       </TableCell>
                     )}
-                    <TableCell className="min-w-[200px] max-w-[400px] whitespace-normal break-words px-6 py-5 align-middle">
+                    <TableCell className="whitespace-normal px-4 py-5 align-middle">
                       <p className="line-clamp-2 break-words text-sm text-muted-foreground">{s.notes}</p>
                     </TableCell>
-                    <TableCell className="px-6 py-5 text-right align-middle">
+                    <TableCell className="px-4 py-5 text-right align-middle">
                       <div className="flex justify-end gap-1 opacity-80 transition-opacity group-hover:opacity-100">
                         <Button
                           size="icon"
