@@ -169,31 +169,31 @@ function Index() {
           </Badge>
         </div>
 
-        <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xl shadow-black/30">
-          <Table className="w-full table-auto">
+        <div className="w-full rounded-xl border border-border bg-card shadow-xl shadow-black/30">
+          <Table className="w-full table-fixed">
             <TableHeader>
               <TableRow className="border-b-2 border-border bg-secondary/60 hover:bg-secondary/60">
-                <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[200px]">
+                <TableHead className="w-[15%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                   Fournisseur
                 </TableHead>
-                <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[140px]">
+                <TableHead className="w-[15%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                   Domaine
                 </TableHead>
-                <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[140px]">
+                <TableHead className="w-[12%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                   Liens
                 </TableHead>
-                <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[220px]">
+                <TableHead className="w-[18%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                   Contact
                 </TableHead>
                 {isAdmin && (
-                  <TableHead className="whitespace-nowrap px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground min-w-[180px]">
+                  <TableHead className="w-[12%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                     Accès
                   </TableHead>
                 )}
-                <TableHead className="min-w-[200px] max-w-[400px] whitespace-normal break-words px-6 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="w-auto whitespace-normal px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                   Notes
                 </TableHead>
-                <TableHead className="whitespace-nowrap w-[160px] px-6 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="w-[10%] whitespace-nowrap px-4 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">
                   Actions
                 </TableHead>
               </TableRow>
