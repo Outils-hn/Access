@@ -12,8 +12,6 @@ import {
   Building2,
   MailPlus,
   Settings,
-  Eye,
-  EyeOff,
   LogIn,
   LogOut,
   ShieldCheck,
