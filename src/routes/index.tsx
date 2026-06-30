@@ -63,7 +63,6 @@ function Index() {
   const [editing, setEditing] = useState<Supplier | null>(null);
   const [toDelete, setToDelete] = useState<Supplier | null>(null);
   const [mailFor, setMailFor] = useState<Supplier | null>(null);
-  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
