@@ -382,21 +382,3 @@ function Index() {
   );
 }
 
-function AccessCell({ value, revealed, onToggle }: { value: string; revealed: boolean; onToggle: () => void }) {
-  if (!value) return <span className="text-xs text-muted-foreground">—</span>;
-  return (
-    <div className="flex items-center gap-2">
-      <code className="rounded bg-muted px-2 py-1 font-mono text-xs text-foreground">
-        {revealed ? value : "••••••••"}
-      </code>
-      <button
-        type="button"
-        onClick={onToggle}
-        className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-        aria-label={revealed ? "Masquer" : "Afficher"}
-      >
-        {revealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-      </button>
-    </div>
-  );
-}
