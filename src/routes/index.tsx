@@ -280,8 +280,8 @@ function Index() {
                         )}
                       </TableCell>
                     )}
-                    <TableCell className="px-6 py-5 align-middle">
-                      <p className="line-clamp-2 text-sm text-muted-foreground">{s.notes}</p>
+                    <TableCell className="whitespace-normal px-6 py-5 align-middle min-w-[280px]">
+                      <p className="line-clamp-2 break-words text-sm text-muted-foreground">{s.notes}</p>
                     </TableCell>
                     <TableCell className="px-6 py-5 text-right align-middle">
                       <div className="flex justify-end gap-1 opacity-80 transition-opacity group-hover:opacity-100">
