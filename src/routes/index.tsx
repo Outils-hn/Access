@@ -270,9 +270,10 @@ function Index() {
                       </div>
                     </TableCell>
                     {isAdmin && (
-                      <TableCell className="px-4 py-5 align-middle">
+                      <TableCell className="whitespace-nowrap px-4 py-5 align-middle">
                         {secrets[s.id] ? (
-                          <code className="block truncate rounded bg-muted px-2 py-1 font-mono text-xs text-foreground" title={secrets[s.id]}>
+                          <code className="rounded bg-muted px-2 py-1 font-mono text-xs text-foreground">
+
                             {secrets[s.id]}
                           </code>
                         ) : (
