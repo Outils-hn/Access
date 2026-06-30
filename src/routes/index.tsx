@@ -176,24 +176,24 @@ function Index() {
                 <TableHead className="w-[15%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                   Fournisseur
                 </TableHead>
-                <TableHead className="w-[15%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="w-[12%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                   Domaine
                 </TableHead>
-                <TableHead className="w-[12%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="w-[8%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                   Liens
                 </TableHead>
-                <TableHead className="w-[18%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="w-[15%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                   Contact
                 </TableHead>
                 {isAdmin && (
-                  <TableHead className="w-[12%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
+                  <TableHead className="w-[18%] whitespace-nowrap px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                     Accès
                   </TableHead>
                 )}
                 <TableHead className="w-auto whitespace-normal px-4 py-5 text-xs font-semibold uppercase tracking-wider text-foreground">
                   Notes
                 </TableHead>
-                <TableHead className="w-[10%] whitespace-nowrap px-4 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">
+                <TableHead className="w-[8%] whitespace-nowrap px-4 py-5 text-right text-xs font-semibold uppercase tracking-wider text-foreground">
                   Actions
                 </TableHead>
               </TableRow>
