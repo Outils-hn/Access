@@ -269,7 +269,7 @@ function Index() {
 
                 {/* Right: Notes + Actions */}
                 <div className="flex min-w-0 items-start gap-3 lg:col-span-3 lg:justify-end">
-                  <p className="line-clamp-2 min-w-0 flex-1 break-words text-sm text-muted-foreground">
+                  <p className="min-w-0 flex-1 whitespace-pre-wrap break-words text-sm text-muted-foreground">
                     {s.notes}
                   </p>
                   <div className="flex shrink-0 gap-1 opacity-80 transition-opacity group-hover:opacity-100">
