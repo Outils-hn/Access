@@ -33,7 +33,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-
 import { useSuppliers, useDomains, useSupplierSecrets, domainBadgeClass, type Supplier } from "@/lib/suppliers-store";
 import { SupplierForm } from "@/components/supplier-form";
 import { EmailGenerator } from "@/components/email-generator";
@@ -43,7 +42,7 @@ import { useAuth } from "@/lib/auth-context";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Annuaire Fournisseurs — Façade" },
+      { title: "Access ·" },
       { name: "description", content: "Gestion des fournisseurs pour dessinateur-projeteur en façade." },
       { property: "og:title", content: "Annuaire fournisseurs — Façade" },
       { property: "og:description", content: "Annuaire interne des fournisseurs façade." },
@@ -86,8 +85,6 @@ function Index() {
     setEditing(s);
     setOpen(true);
   };
-
-  
 
   return (
     <main className="min-h-screen bg-background">
@@ -182,9 +179,7 @@ function Index() {
               >
                 {/* Left: Name + Domain */}
                 <div className="min-w-0 lg:col-span-3">
-                  <h3 className="truncate text-base font-semibold tracking-tight text-foreground">
-                    {s.name}
-                  </h3>
+                  <h3 className="truncate text-base font-semibold tracking-tight text-foreground">{s.name}</h3>
                   <div className="mt-1.5">
                     <Badge
                       variant="outline"
@@ -201,9 +196,7 @@ function Index() {
                     Contact
                   </div>
                   <div className="mt-1 space-y-0.5 text-sm">
-                    {s.contactName && (
-                      <div className="truncate font-medium text-foreground">{s.contactName}</div>
-                    )}
+                    {s.contactName && <div className="truncate font-medium text-foreground">{s.contactName}</div>}
                     {s.contactEmail && (
                       <a
                         href={`mailto:${s.contactEmail}`}
@@ -366,4 +359,3 @@ function Index() {
     </main>
   );
 }
-
