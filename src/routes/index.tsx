@@ -190,41 +190,43 @@ function Index() {
                   </div>
                 </div>
 
-                {/* Center col 1: Contact */}
-                <div className="min-w-0 lg:col-span-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Contact
+                {/* Contact — admin only */}
+                {isAdmin && (
+                  <div className="min-w-0 lg:col-span-3">
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      Contact
+                    </div>
+                    <div className="mt-1 space-y-0.5 text-sm">
+                      {s.contactName && <div className="truncate font-medium text-foreground">{s.contactName}</div>}
+                      {s.contactEmail && (
+                        <a
+                          href={`mailto:${s.contactEmail}`}
+                          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary"
+                        >
+                          <Mail className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{s.contactEmail}</span>
+                        </a>
+                      )}
+                      {s.contactPhone && (
+                        <a
+                          href={`tel:${s.contactPhone}`}
+                          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary"
+                        >
+                          <Phone className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{s.contactPhone}</span>
+                        </a>
+                      )}
+                      {!s.contactName && !s.contactEmail && !s.contactPhone && (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="mt-1 space-y-0.5 text-sm">
-                    {s.contactName && <div className="truncate font-medium text-foreground">{s.contactName}</div>}
-                    {s.contactEmail && (
-                      <a
-                        href={`mailto:${s.contactEmail}`}
-                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary"
-                      >
-                        <Mail className="h-3 w-3 shrink-0" />
-                        <span className="truncate">{s.contactEmail}</span>
-                      </a>
-                    )}
-                    {s.contactPhone && (
-                      <a
-                        href={`tel:${s.contactPhone}`}
-                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary"
-                      >
-                        <Phone className="h-3 w-3 shrink-0" />
-                        <span className="truncate">{s.contactPhone}</span>
-                      </a>
-                    )}
-                    {!s.contactName && !s.contactEmail && !s.contactPhone && (
-                      <span className="text-xs text-muted-foreground">—</span>
-                    )}
-                  </div>
-                </div>
+                )}
 
-                {/* Center col 2: Liens & Accès */}
-                <div className="min-w-0 lg:col-span-3">
+                {/* Liens (+ Accès admin) */}
+                <div className={`min-w-0 ${isAdmin ? "lg:col-span-3" : "lg:col-span-4"}`}>
                   <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Liens &amp; Accès
+                    {isAdmin ? "Liens & Accès" : "Liens"}
                   </div>
                   <div className="mt-1 flex flex-col gap-1 text-sm">
                     {s.website && (
@@ -260,38 +262,36 @@ function Index() {
                   </div>
                 </div>
 
-                {/* Right: Notes + Actions */}
-                <div className="flex min-w-0 items-start gap-3 lg:col-span-3 lg:justify-end">
+                {/* Notes + Actions */}
+                <div className={`flex min-w-0 items-start gap-3 lg:justify-end ${isAdmin ? "lg:col-span-3" : "lg:col-span-5"}`}>
                   <p className="min-w-0 flex-1 whitespace-pre-wrap break-words text-sm text-muted-foreground">
                     {s.notes}
                   </p>
-                  <div className="flex shrink-0 gap-1 opacity-80 transition-opacity group-hover:opacity-100">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => setMailFor(s)}
-                      aria-label="Générer un mail"
-                      title="Générer un mail"
-                    >
-                      <MailPlus className="h-4 w-4" />
-                    </Button>
-                    {isAdmin && (
-                      <>
-                        <Button size="icon" variant="ghost" onClick={() => openEdit(s)} aria-label="Modifier">
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => setToDelete(s)}
-                          aria-label="Supprimer"
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
+                  {isAdmin && (
+                    <div className="flex shrink-0 gap-1 opacity-80 transition-opacity group-hover:opacity-100">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setMailFor(s)}
+                        aria-label="Générer un mail"
+                        title="Générer un mail"
+                      >
+                        <MailPlus className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon" variant="ghost" onClick={() => openEdit(s)} aria-label="Modifier">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setToDelete(s)}
+                        aria-label="Supprimer"
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </article>
             ))
