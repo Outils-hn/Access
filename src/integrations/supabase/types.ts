@@ -89,6 +89,13 @@ export type Database = {
             referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "supplier_secrets_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: true
+            referencedRelation: "suppliers_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       suppliers: {
@@ -135,7 +142,39 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      suppliers_public: {
+        Row: {
+          cad_website: string | null
+          created_at: string | null
+          domain: string | null
+          id: string | null
+          name: string | null
+          notes: string | null
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          cad_website?: string | null
+          created_at?: string | null
+          domain?: string | null
+          id?: string | null
+          name?: string | null
+          notes?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          cad_website?: string | null
+          created_at?: string | null
+          domain?: string | null
+          id?: string | null
+          name?: string | null
+          notes?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
