@@ -59,18 +59,23 @@ const toRowPayload = (s: Supplier) => ({
 });
 
 export function useSuppliers() {
+  const { isAdmin } = useAuth();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
+    const table = isAdmin ? "suppliers" : "suppliers_public";
+    const columns = isAdmin
+      ? "id,name,domain,website,cad_website,contact_name,contact_email,contact_phone,notes"
+      : "id,name,domain,website,cad_website,notes";
     const { data, error } = await supabase
-      .from("suppliers")
-      .select("id,name,domain,website,cad_website,contact_name,contact_email,contact_phone,notes")
+      .from(table)
+      .select(columns)
       .order("name", { ascending: true });
     if (error) { console.error(error); setLoading(false); return; }
-    setSuppliers((data as Row[]).map(fromRow));
+    setSuppliers((data as unknown as Row[]).map(fromRow));
     setLoading(false);
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
