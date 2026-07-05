@@ -69,7 +69,7 @@ export function useSuppliers() {
       ? "id,name,domain,website,cad_website,contact_name,contact_email,contact_phone,notes"
       : "id,name,domain,website,cad_website,notes";
     const { data, error } = await supabase
-      .from(table)
+      .from(table as "suppliers")
       .select(columns)
       .order("name", { ascending: true });
     if (error) { console.error(error); setLoading(false); return; }
