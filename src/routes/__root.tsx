@@ -13,8 +13,6 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { Shell } from "@/components/access/Shell";
-import { PinDialog } from "@/lib/pin";
-import { CoffreDialog } from "@/components/access/CoffreDialog";
 
 function NotFoundComponent() {
   return (
@@ -131,8 +129,6 @@ function RootComponent() {
       <Shell>
         <Outlet />
       </Shell>
-      <PinDialog />
-      <CoffreDialog />
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );

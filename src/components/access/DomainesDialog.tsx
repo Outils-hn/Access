@@ -13,7 +13,7 @@ export function DomainesDialog({ open, onOpenChange }: { open: boolean; onOpenCh
 
   const ajouter = async () => {
     if (!nouveau.trim()) return;
-    if (await enregistrerDomaine({ nom: nouveau.trim() })) setNouveau("");
+    if (await enregistrerDomaine({ nom: nouveau.trim(), ordre: Math.max(0, ...domaines.map((d) => d.ordre)) + 1 })) setNouveau("");
   };
   // Echange l'ordre avec le voisin (ordres renumerotes 1, 2, 3... pour eviter les egalites)
   const deplacer = async (i: number, sens: -1 | 1) => {

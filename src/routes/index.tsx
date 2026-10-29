@@ -7,7 +7,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { grouper, useActions, useAnnuaire, type Fournisseur } from "@/lib/donnees";
+import { grouper, useAcces, useActions, useAnnuaire, type Fournisseur } from "@/lib/donnees";
+import { useCompte } from "@/lib/compte";
 import { correspond, hote } from "@/lib/recherche";
 import { AccesCellule } from "@/components/access/AccesCellule";
 import { FournisseurDialog } from "@/components/access/FournisseurDialog";
@@ -21,6 +22,8 @@ export const Route = createFileRoute("/")({
 function Annuaire() {
   const { domaines, fournisseurs, chargement, erreur } = useAnnuaire();
   const { supprimerFournisseur } = useActions();
+  const { valide } = useCompte();
+  const acces = useAcces();
   const [q, setQ] = useState("");
   const [filtre, setFiltre] = useState<string | null>(null);
   const [edition, setEdition] = useState<{ f: Fournisseur | null; domaine?: string } | null>(null);
@@ -56,7 +59,7 @@ function Annuaire() {
         <h2 className="font-semibold">{pasPrete ? "Base pas encore préparée" : "Base injoignable"}</h2>
         <p className="mt-2 text-muted-foreground">
           {pasPrete
-            ? "Les tables d'Access n'existent pas encore dans le projet Supabase de Masse : lancer le fichier supabase/access.sql dans le SQL Editor."
+            ? "Les tables d'Access n'existent pas encore dans le projet Supabase d'Index : lancer le fichier supabase/access-index.sql dans le SQL Editor."
             : "Vérifiez la connexion puis rechargez la page."}
         </p>
       </div>
@@ -73,12 +76,12 @@ function Annuaire() {
           <kbd className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-border px-1.5 font-mono text-[10px] text-muted-foreground">/</kbd>
         </div>
         <span className="text-sm text-muted-foreground">{total} fournisseur{total > 1 ? "s" : ""}</span>
-        <div className="ml-auto flex gap-2">
+        {valide && <div className="ml-auto flex gap-2">
           <Button variant="outline" className="gap-1.5" onClick={() => setGererDomaines(true)}><Settings2 className="size-4" /> Domaines</Button>
           <Button className="gap-1.5" disabled={!domaines.length} onClick={() => setEdition({ f: null, domaine: filtre ?? undefined })}>
             <Plus className="size-4" /> Nouveau fournisseur
           </Button>
-        </div>
+        </div>}
       </div>
 
       {domaines.length > 0 && (
@@ -94,7 +97,8 @@ function Annuaire() {
         <div className="panel mx-auto mt-10 max-w-lg p-6 text-center text-sm">
           <h2 className="font-semibold">L'annuaire est vide</h2>
           <p className="mt-2 text-muted-foreground">Commencez par créer les domaines (menuiserie alu, isolation, quincaillerie…), puis ajoutez les fournisseurs. Une sauvegarde peut aussi être importée depuis le pied de page.</p>
-          <Button className="mt-4 gap-1.5" onClick={() => setGererDomaines(true)}><Plus className="size-4" /> Créer un domaine</Button>
+          {valide ? <Button className="mt-4 gap-1.5" onClick={() => setGererDomaines(true)}><Plus className="size-4" /> Créer un domaine</Button>
+            : <p className="mt-3 text-muted-foreground">Connectez-vous avec un compte Index validé pour le remplir.</p>}
         </div>
       ) : visibles.length === 0 ? (
         <p className="py-16 text-center text-sm text-muted-foreground">Aucun fournisseur ne correspond à « {q} ».</p>
@@ -104,7 +108,7 @@ function Annuaire() {
             <section key={g.domaine.id} className="panel overflow-hidden" aria-labelledby={`d-${g.domaine.id}`}>
               <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
                 <h2 id={`d-${g.domaine.id}`} className="card-title">{g.domaine.nom} <span className="text-muted-foreground">· {g.fournisseurs.length}</span></h2>
-                <button className="text-xs text-muted-foreground hover:text-foreground" onClick={() => setEdition({ f: null, domaine: g.domaine.id })}>+ Ajouter ici</button>
+                {valide && <button className="text-xs text-muted-foreground hover:text-foreground" onClick={() => setEdition({ f: null, domaine: g.domaine.id })}>+ Ajouter ici</button>}
               </div>
               {g.fournisseurs.length === 0 ? (
                 <p className="px-4 py-4 text-sm text-muted-foreground">Aucun fournisseur dans ce domaine.</p>
@@ -130,13 +134,13 @@ function Annuaire() {
                             )}
                           </div>
                         </td>
-                        <td><AccesCellule bloc={f.acces} nom={f.nom} /></td>
+                        <td><AccesCellule bureau={acces.bureau(f.id)} perso={acces.perso(f.id)} nom={f.nom} connecte={valide} /></td>
                         <td className="truncate text-muted-foreground" title={f.notes}>{f.notes}</td>
                         <td>
-                          <div className="flex justify-end opacity-60 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                          {valide && <div className="flex justify-end opacity-60 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                             <Button size="icon" variant="ghost" className="size-8" onClick={() => setEdition({ f })} aria-label={`Modifier ${f.nom}`}><Pencil className="size-4" /></Button>
                             <Button size="icon" variant="ghost" className="size-8 text-destructive hover:text-destructive" onClick={() => setASupprimer(f)} aria-label={`Supprimer ${f.nom}`}><Trash2 className="size-4" /></Button>
-                          </div>
+                          </div>}
                         </td>
                       </tr>
                     ))}
@@ -154,7 +158,7 @@ function Annuaire() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Supprimer {aSupprimer?.nom} ?</AlertDialogTitle>
-            <AlertDialogDescription>Le fournisseur et son accès sont retirés de l'annuaire. Pensez à télécharger une sauvegarde avant les grands ménages.</AlertDialogDescription>
+            <AlertDialogDescription>Le fournisseur et ses accès (bureau et perso de chacun) sont retirés de l'annuaire. Pensez à télécharger une sauvegarde avant les grands ménages.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>

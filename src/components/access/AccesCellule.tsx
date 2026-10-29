@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
-import { Copy, Eye, EyeOff, Lock } from "lucide-react";
+import { useState } from "react";
+import { Copy, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import { dechiffrerAcces, type Acces, type Bloc } from "@/lib/coffre";
-import { useCle } from "@/lib/cle-session";
-import { ouvrirCoffre } from "./CoffreDialog";
+import type { Acces } from "@/lib/donnees";
 
 async function copier(texte: string, quoi: string) {
   try { await navigator.clipboard.writeText(texte); toast.success(`${quoi} copié`, { id: "copie" }); }
@@ -12,47 +10,40 @@ async function copier(texte: string, quoi: string) {
 
 const btn = "inline-flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground";
 
-/** Identifiant et mot de passe d'un fournisseur : masques tant que le coffre est verrouille. */
-export function AccesCellule({ bloc, nom }: { bloc: Bloc | null; nom: string }) {
-  const cle = useCle();
-  const [acces, setAcces] = useState<Acces | null>(null);
-  const [erreur, setErreur] = useState(false);
+/** Un acces (bureau ou perso) : identifiant + mot de passe masque, boutons copier. */
+function Ligne({ a, etiquette, nom }: { a: Acces; etiquette: string; nom: string }) {
   const [voir, setVoir] = useState(false);
-
-  useEffect(() => {
-    let actif = true;
-    setAcces(null); setErreur(false); setVoir(false);
-    if (cle && bloc) dechiffrerAcces(cle, bloc).then((a) => actif && setAcces(a)).catch(() => actif && setErreur(true));
-    return () => { actif = false; };
-  }, [cle, bloc]);
-
-  if (!bloc) return <span className="text-muted-foreground">—</span>;
-  if (!cle) {
-    return (
-      <button type="button" onClick={() => ouvrirCoffre("ouvrir")} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground" aria-label={`Afficher l'accès de ${nom}`}>
-        <Lock className="size-3.5" /> Accès enregistré
-      </button>
-    );
-  }
-  if (erreur) return <span className="text-xs text-destructive">Illisible (autre phrase secrète)</span>;
-  if (!acces) return <span className="text-xs text-muted-foreground">…</span>;
   return (
-    <div className="inline-grid max-w-full grid-cols-[minmax(0,max-content)_auto] items-center gap-x-2 font-mono text-xs">
-      <span className="truncate" title={acces.identifiant}>{acces.identifiant || "—"}</span>
-      <span className="flex">
-        {acces.identifiant && <button type="button" className={btn} onClick={() => copier(acces.identifiant, "Identifiant")} aria-label={`Copier l'identifiant de ${nom}`}><Copy className="size-3.5" /></button>}
+    <div className="grid grid-cols-[3.25rem_minmax(0,max-content)_auto] items-center gap-x-2">
+      <span className="text-[10px] font-medium uppercase tracking-[0.06em] text-muted-foreground">{etiquette}</span>
+      <span className="flex min-w-0 flex-col font-mono text-xs leading-5">
+        <span className="truncate" title={a.identifiant}>{a.identifiant || "—"}</span>
+        <span className="truncate">{a.mot_de_passe ? (voir ? a.mot_de_passe : "••••••••") : "—"}</span>
       </span>
-      <span className="truncate">{acces.motDePasse ? (voir ? acces.motDePasse : "••••••••") : "—"}</span>
-      <span className="flex">
-        {acces.motDePasse && (
-          <>
-            <button type="button" className={btn} onClick={() => setVoir((v) => !v)} aria-label={voir ? "Masquer le mot de passe" : "Voir le mot de passe"}>
-              {voir ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
-            </button>
-            <button type="button" className={btn} onClick={() => copier(acces.motDePasse, "Mot de passe")} aria-label={`Copier le mot de passe de ${nom}`}><Copy className="size-3.5" /></button>
-          </>
-        )}
+      <span className="flex flex-col">
+        <span className="flex">{a.identifiant && <button type="button" className={btn} onClick={() => copier(a.identifiant, "Identifiant")} aria-label={`Copier l'identifiant ${etiquette.toLowerCase()} de ${nom}`}><Copy className="size-3.5" /></button>}</span>
+        <span className="flex">
+          {a.mot_de_passe && (
+            <>
+              <button type="button" className={btn} onClick={() => copier(a.mot_de_passe, "Mot de passe")} aria-label={`Copier le mot de passe ${etiquette.toLowerCase()} de ${nom}`}><Copy className="size-3.5" /></button>
+              <button type="button" className={btn} onClick={() => setVoir((v) => !v)} aria-label={voir ? "Masquer le mot de passe" : "Voir le mot de passe"}>
+                {voir ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+              </button>
+            </>
+          )}
+        </span>
       </span>
+    </div>
+  );
+}
+
+export function AccesCellule({ bureau, perso, nom, connecte }: { bureau: Acces | null; perso: Acces | null; nom: string; connecte: boolean }) {
+  if (!connecte) return <span className="text-xs text-muted-foreground">Connexion requise</span>;
+  if (!bureau && !perso) return <span className="text-muted-foreground">—</span>;
+  return (
+    <div className="space-y-1.5">
+      {bureau && <Ligne a={bureau} etiquette="Bureau" nom={nom} />}
+      {perso && <Ligne a={perso} etiquette="Perso" nom={nom} />}
     </div>
   );
 }
