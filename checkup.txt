@@ -1,0 +1,29 @@
+OK base vide : message d'accueil
+OK langue de la page = fr
+OK fournisseurs groupés par domaine, dans l'ordre
+OK visiteur : accès remplacés par « Connexion requise »
+OK visiteur : pas de bouton d'ajout
+OK recherche « schuco » trouve Schüco (sans tréma)
+OK filtre par puce de domaine
+OK mauvais mot de passe : message clair
+OK compte non validé : « en attente »
+OK compte non validé : pas de modification
+OK compte validé : email affiché
+OK fournisseur créé, https:// ajouté au lien
+OK accès bureau enregistré (sans propriétaire)
+OK accès perso enregistré au nom d'Alice
+OK Alice voit l'accès bureau et le sien
+OK mots de passe masqués par défaut
+OK bouton copier : mot de passe perso dans le presse-papier
+OK Bob voit l'accès du bureau
+OK Bob ne voit PAS l'accès perso d'Alice
+OK Bob ajoute son accès perso
+OK Alice ne voit pas l'accès perso de Bob
+OK après déconnexion : accès masqués
+OK sauvegarde téléchargée (4 fournisseurs)
+OK la sauvegarde ne contient aucun identifiant ni mot de passe
+OK fenêtre À propos
+OK copie locale hors ligne sans les mots de passe
+OK accessibilité : 0 problème(s)
+OK accessibilité (sombre) : 0 problème(s)
+OK sélecteur : 7 applis
