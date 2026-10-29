@@ -1,15 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Box, ExternalLink, Pencil, Plus, Search, Settings2, Trash2 } from "lucide-react";
+import { Box, ExternalLink, FileText, Pencil, Plus, Search, Settings2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { grouper, useAcces, useActions, useAnnuaire, type Fournisseur } from "@/lib/donnees";
+import { grouper, useAcces, useActions, useAnnuaire, useFichesIndex, type Fournisseur } from "@/lib/donnees";
+import { INDEX_URL } from "@/lib/base";
 import { useCompte } from "@/lib/compte";
-import { correspond, hote } from "@/lib/recherche";
+import { compterFiches, correspond, hote } from "@/lib/recherche";
 import { AccesCellule } from "@/components/access/AccesCellule";
 import { FournisseurDialog } from "@/components/access/FournisseurDialog";
 import { DomainesDialog } from "@/components/access/DomainesDialog";
@@ -24,6 +25,7 @@ function Annuaire() {
   const { supprimerFournisseur } = useActions();
   const { valide } = useCompte();
   const acces = useAcces();
+  const fichesIndex = useFichesIndex();
   const [q, setQ] = useState("");
   const [filtre, setFiltre] = useState<string | null>(null);
   const [edition, setEdition] = useState<{ f: Fournisseur | null; domaine?: string } | null>(null);
@@ -132,6 +134,7 @@ function Annuaire() {
                                 <Box className="size-3.5 text-muted-foreground" />CAO
                               </a>
                             )}
+                            <LienFiches nom={f.nom} n={compterFiches(f.nom, fichesIndex)} />
                           </div>
                         </td>
                         <td><AccesCellule bureau={acces.bureau(f.id)} perso={acces.perso(f.id)} nom={f.nom} connecte={valide} /></td>
@@ -176,5 +179,16 @@ function Puce({ actif, onClick, label, n }: { actif: boolean; onClick: () => voi
       className={`rounded-full border px-3 py-1 text-xs transition-colors ${actif ? "border-[var(--app-fill)] bg-[var(--app-fill)] text-[var(--app-on)]" : "border-border bg-card text-foreground hover:bg-muted"}`}>
       {label} <span className={actif ? "opacity-80" : "text-muted-foreground"}>{n}</span>
     </button>
+  );
+}
+
+/** Lien vers les fiches techniques du fournisseur dans Index (affiche seulement s'il y en a). */
+function LienFiches({ nom, n }: { nom: string; n: number }) {
+  if (!n) return null;
+  return (
+    <a href={`${INDEX_URL}/?q=${encodeURIComponent(nom)}`} target="_blank" rel="noopener noreferrer"
+      className="inline-flex shrink-0 items-center gap-1 underline-offset-2 hover:underline" title={`Ouvrir les fiches ${nom} dans Index`}>
+      <FileText className="size-3.5 text-muted-foreground" />{n} fiche{n > 1 ? "s" : ""}
+    </a>
   );
 }

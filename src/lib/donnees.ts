@@ -37,6 +37,21 @@ export function useAnnuaire() {
   return { ...(q.data ?? vide), chargement: q.isLoading, erreur: q.error as Error | null };
 }
 
+/** Fournisseur de chaque fiche Index active (meme base : lecture libre), pour le lien « Fiches ». */
+export function useFichesIndex() {
+  const q = useQuery({
+    queryKey: ["access", "fiches-index"],
+    staleTime: 5 * 60_000,
+    retry: 0,
+    queryFn: async () => {
+      const { data, error } = await db.from("products").select("supplier").is("deleted_at", null);
+      if (error) throw error;
+      return ((data ?? []) as { supplier: string | null }[]).map((r) => r.supplier ?? "");
+    },
+  });
+  return q.data ?? [];
+}
+
 /** Acces lisibles par le compte connecte : ceux du bureau et les siens (filtre fait par la base). */
 export function useAcces() {
   const { uid, valide } = useCompte();
