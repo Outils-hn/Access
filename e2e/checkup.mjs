@@ -108,7 +108,7 @@ try {
   await p.getByLabel("Confirmer la phrase").fill(PHRASE);
   await shot(p, "03-creer-coffre");
   await p.getByRole("button", { name: "Créer le coffre" }).click();
-  await p.getByLabel("Code PIN").fill(PIN);
+  await p.getByLabel("Code PIN", { exact: true }).fill(PIN);
   await p.getByRole("button", { name: "Déverrouiller", exact: true }).click();
   await p.getByLabel("Identifiant").waitFor({ timeout: 15000 });
   ok(!!etat.coffre, "coffre créé dans la base");

@@ -28,7 +28,7 @@ jobs:
       - name: Controle TypeScript
         run: |
           npx tsc --noEmit > step.log 2>&1 || true
-          grep -E "error TS" step.log | grep -vE "^src/routes/__root\.tsx\(112,|^src/lib/api/example\.functions\.ts" > errs.log || true
-          grep -E "error TS" step.log | grep -E "^src/routes/__root\.tsx\(112,|^src/lib/api/example\.functions\.ts" | while IFS= read -r l; do echo "::warning::$l"; done
+          grep -E "error TS" step.log | grep -vE "^src/routes/__root\.tsx\([0-9]+,3\): error TS2322|^src/lib/api/example\.functions\.ts" > errs.log || true
+          grep -E "error TS" step.log | grep -E "^src/routes/__root\.tsx\([0-9]+,3\): error TS2322|^src/lib/api/example\.functions\.ts" | while IFS= read -r l; do echo "::warning::$l"; done
           if [ -s errs.log ]; then head -n 25 errs.log | while IFS= read -r l; do echo "::error::$l"; done; exit 1; fi
       # La construction de production reste faite par Lovable (sa configuration ne tourne pas hors de Lovable).
