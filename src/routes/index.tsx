@@ -1,361 +1,176 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import {
-  Plus,
-  Search,
-  Pencil,
-  Trash2,
-  ExternalLink,
-  Box,
-  Mail,
-  Phone,
-  Building2,
-  MailPlus,
-  Settings,
-  LogIn,
-  LogOut,
-  ShieldCheck,
-} from "lucide-react";
-
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Box, ExternalLink, Pencil, Plus, Search, Settings2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-import { useSuppliers, useDomains, useSupplierSecrets, domainBadgeClass, type Supplier } from "@/lib/suppliers-store";
-import { SupplierForm } from "@/components/supplier-form";
-import { EmailGenerator } from "@/components/email-generator";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { useAuth } from "@/lib/auth-context";
+import { grouper, useActions, useAnnuaire, type Fournisseur } from "@/lib/donnees";
+import { correspond, hote } from "@/lib/recherche";
+import { AccesCellule } from "@/components/access/AccesCellule";
+import { FournisseurDialog } from "@/components/access/FournisseurDialog";
+import { DomainesDialog } from "@/components/access/DomainesDialog";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Access ·" },
-      { name: "description", content: "Gestion des fournisseurs pour dessinateur-projeteur en façade." },
-      { property: "og:title", content: "Annuaire fournisseurs — Façade" },
-      { property: "og:description", content: "Annuaire interne des fournisseurs façade." },
-    ],
-  }),
-  component: Index,
+  head: () => ({ meta: [{ title: "Access — annuaire des fournisseurs" }] }),
+  component: Annuaire,
 });
 
-function Index() {
-  const { isAdmin, user, signOut } = useAuth();
-  const { suppliers, upsert, remove } = useSuppliers();
-  const { domains } = useDomains();
-  const { secrets, refresh: refreshSecrets } = useSupplierSecrets();
-  const [query, setQuery] = useState("");
-  const [domainFilter, setDomainFilter] = useState<string>("all");
-  const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<Supplier | null>(null);
-  const [toDelete, setToDelete] = useState<Supplier | null>(null);
-  const [mailFor, setMailFor] = useState<Supplier | null>(null);
+function Annuaire() {
+  const { domaines, fournisseurs, chargement, erreur } = useAnnuaire();
+  const { supprimerFournisseur } = useActions();
+  const [q, setQ] = useState("");
+  const [filtre, setFiltre] = useState<string | null>(null);
+  const [edition, setEdition] = useState<{ f: Fournisseur | null; domaine?: string } | null>(null);
+  const [aSupprimer, setASupprimer] = useState<Fournisseur | null>(null);
+  const [gererDomaines, setGererDomaines] = useState(false);
+  const recherche = useRef<HTMLInputElement>(null);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return suppliers.filter((s) => {
-      if (domainFilter !== "all" && s.domain !== domainFilter) return false;
-      if (!q) return true;
-      return (
-        s.name.toLowerCase().includes(q) ||
-        s.domain.toLowerCase().includes(q) ||
-        (s.contactName ?? "").toLowerCase().includes(q) ||
-        (s.notes ?? "").toLowerCase().includes(q)
-      );
-    });
-  }, [suppliers, query, domainFilter]);
+  // « / » place le curseur dans la recherche, Echap la vide
+  useEffect(() => {
+    const f = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement;
+      if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(t.tagName) && !t.isContentEditable) { e.preventDefault(); recherche.current?.focus(); }
+    };
+    window.addEventListener("keydown", f);
+    return () => window.removeEventListener("keydown", f);
+  }, []);
 
-  const openNew = () => {
-    setEditing(null);
-    setOpen(true);
-  };
-  const openEdit = (s: Supplier) => {
-    setEditing(s);
-    setOpen(true);
-  };
+  const groupes = useMemo(() => grouper(domaines, fournisseurs), [domaines, fournisseurs]);
+  const visibles = useMemo(
+    () => groupes
+      .filter((g) => !filtre || g.domaine.id === filtre)
+      .map((g) => ({ ...g, fournisseurs: g.fournisseurs.filter((f) => correspond(f, g.domaine.nom, q)) }))
+      .filter((g) => g.fournisseurs.length > 0 || (!q && filtre === g.domaine.id)),
+    [groupes, filtre, q],
+  );
+  const total = visibles.reduce((n, g) => n + g.fournisseurs.length, 0);
+
+  if (chargement) return <p className="py-16 text-center text-sm text-muted-foreground">Chargement…</p>;
+  if (erreur) {
+    const pasPrete = /access_|schema cache|does not exist|PGRST205|42P01/i.test(erreur.message ?? "");
+    return (
+      <div className="panel mx-auto mt-10 max-w-lg p-6 text-sm">
+        <h2 className="font-semibold">{pasPrete ? "Base pas encore préparée" : "Base injoignable"}</h2>
+        <p className="mt-2 text-muted-foreground">
+          {pasPrete
+            ? "Les tables d'Access n'existent pas encore dans le projet Supabase de Masse : lancer le fichier supabase/access.sql dans le SQL Editor."
+            : "Vérifiez la connexion puis rechargez la page."}
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card/60 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary ring-1 ring-primary/30">
-              <Building2 className="h-5 w-5" />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold tracking-tight">Annuaire Fournisseurs</h1>
-              <p className="text-xs text-muted-foreground">
-                Bureau d'études — Façade {isAdmin ? "· Mode admin" : "· Mode invité (lecture seule)"}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {isAdmin && (
-              <>
-                <Button asChild variant="outline" className="gap-2">
-                  <Link to="/configuration">
-                    <Settings className="h-4 w-4" /> Configuration
-                  </Link>
-                </Button>
-                <Button onClick={openNew} className="gap-2">
-                  <Plus className="h-4 w-4" /> Nouveau fournisseur
-                </Button>
-              </>
-            )}
-            {isAdmin ? (
-              <Button variant="outline" className="gap-2" onClick={() => signOut()} title={user?.email ?? ""}>
-                <LogOut className="h-4 w-4" /> Déconnexion
-              </Button>
-            ) : (
-              <Button asChild variant="default" className="gap-2">
-                <Link to="/auth">
-                  <LogIn className="h-4 w-4" /> Connexion admin
-                </Link>
-              </Button>
-            )}
-            <ThemeToggle />
-          </div>
+    <>
+      <div className="mb-5 flex items-center gap-3">
+        <div className="relative w-96">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input ref={recherche} value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === "Escape" && setQ("")}
+            placeholder="Rechercher un fournisseur, un domaine, une note…" aria-label="Rechercher" className="pl-9 pr-8" />
+          <kbd className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-border px-1.5 font-mono text-[10px] text-muted-foreground">/</kbd>
         </div>
-      </header>
-
-      <section className="mx-auto max-w-7xl px-6 py-8">
-        {!isAdmin && (
-          <div className="mb-4 flex items-center gap-2 rounded-md border border-border bg-muted/40 px-4 py-2 text-sm text-muted-foreground">
-            <ShieldCheck className="h-4 w-4" />
-            Vous êtes en mode invité. Connectez-vous pour ajouter, modifier ou voir les mots de passe d'accès.
-          </div>
-        )}
-
-        <div className="mb-6 flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-[240px]">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Rechercher par nom, domaine, contact, note..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          <Select value={domainFilter} onValueChange={setDomainFilter}>
-            <SelectTrigger className="w-[220px]">
-              <SelectValue placeholder="Filtrer par domaine" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous les domaines</SelectItem>
-              {domains.map((d) => (
-                <SelectItem key={d.id} value={d.name}>
-                  {d.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Badge variant="secondary" className="ml-auto">
-            {filtered.length} fournisseur{filtered.length > 1 ? "s" : ""}
-          </Badge>
+        <span className="text-sm text-muted-foreground">{total} fournisseur{total > 1 ? "s" : ""}</span>
+        <div className="ml-auto flex gap-2">
+          <Button variant="outline" className="gap-1.5" onClick={() => setGererDomaines(true)}><Settings2 className="size-4" /> Domaines</Button>
+          <Button className="gap-1.5" disabled={!domaines.length} onClick={() => setEdition({ f: null, domaine: filtre ?? undefined })}>
+            <Plus className="size-4" /> Nouveau fournisseur
+          </Button>
         </div>
+      </div>
 
-        <div className="flex flex-col gap-3">
-          {filtered.length === 0 ? (
-            <div className="rounded-xl border border-border bg-card py-16 text-center text-muted-foreground shadow-sm">
-              Aucun fournisseur trouvé.
-            </div>
-          ) : (
-            filtered.map((s) => (
-              <article
-                key={s.id}
-                className="group grid grid-cols-1 gap-4 rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 lg:grid-cols-12 lg:items-center"
-              >
-                {/* Left: Name + Domain */}
-                <div className="min-w-0 lg:col-span-3">
-                  <h3 className="truncate text-base font-semibold tracking-tight text-foreground">{s.name}</h3>
-                  <div className="mt-1.5">
-                    <Badge
-                      variant="outline"
-                      className={`inline-flex whitespace-nowrap border ${domainBadgeClass(s.domain, domains)} px-2.5 py-0.5 text-xs font-semibold shadow-sm`}
-                    >
-                      {s.domain}
-                    </Badge>
-                  </div>
-                </div>
-
-                {/* Contact — admin only */}
-                {isAdmin && (
-                  <div className="min-w-0 lg:col-span-3">
-                    <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      Contact
-                    </div>
-                    <div className="mt-1 space-y-0.5 text-sm">
-                      {s.contactName && <div className="truncate font-medium text-foreground">{s.contactName}</div>}
-                      {s.contactEmail && (
-                        <a
-                          href={`mailto:${s.contactEmail}`}
-                          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary"
-                        >
-                          <Mail className="h-3 w-3 shrink-0" />
-                          <span className="truncate">{s.contactEmail}</span>
-                        </a>
-                      )}
-                      {s.contactPhone && (
-                        <a
-                          href={`tel:${s.contactPhone}`}
-                          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary"
-                        >
-                          <Phone className="h-3 w-3 shrink-0" />
-                          <span className="truncate">{s.contactPhone}</span>
-                        </a>
-                      )}
-                      {!s.contactName && !s.contactEmail && !s.contactPhone && (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Liens (+ Accès admin) */}
-                <div className={`min-w-0 ${isAdmin ? "lg:col-span-3" : "lg:col-span-4"}`}>
-                  <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {isAdmin ? "Liens & Accès" : "Liens"}
-                  </div>
-                  <div className="mt-1 flex flex-col gap-1 text-sm">
-                    {s.website && (
-                      <a
-                        href={s.website}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 text-primary hover:underline"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                        <span className="truncate">Site web</span>
-                      </a>
-                    )}
-                    {s.cadWebsite && (
-                      <a
-                        href={s.cadWebsite}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 text-primary hover:underline"
-                      >
-                        <Box className="h-3.5 w-3.5 shrink-0" />
-                        <span className="truncate">CAO</span>
-                      </a>
-                    )}
-                    {isAdmin && secrets[s.id] && (
-                      <code className="mt-0.5 inline-block max-w-full truncate rounded bg-muted px-2 py-1 font-mono text-xs text-foreground">
-                        {secrets[s.id]}
-                      </code>
-                    )}
-                    {!s.website && !s.cadWebsite && !(isAdmin && secrets[s.id]) && (
-                      <span className="text-xs text-muted-foreground">—</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Notes + Actions */}
-                <div className={`flex min-w-0 items-start gap-3 lg:justify-end ${isAdmin ? "lg:col-span-3" : "lg:col-span-5"}`}>
-                  <p className="min-w-0 flex-1 whitespace-pre-wrap break-words text-sm text-muted-foreground">
-                    {s.notes}
-                  </p>
-                  {isAdmin && (
-                    <div className="flex shrink-0 gap-1 opacity-80 transition-opacity group-hover:opacity-100">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => setMailFor(s)}
-                        aria-label="Générer un mail"
-                        title="Générer un mail"
-                      >
-                        <MailPlus className="h-4 w-4" />
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={() => openEdit(s)} aria-label="Modifier">
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => setToDelete(s)}
-                        aria-label="Supprimer"
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </article>
-            ))
-          )}
+      {domaines.length > 0 && (
+        <div className="mb-6 flex flex-wrap gap-1.5" role="group" aria-label="Filtrer par domaine">
+          <Puce actif={!filtre} onClick={() => setFiltre(null)} label="Tous" n={fournisseurs.length} />
+          {groupes.map((g) => (
+            <Puce key={g.domaine.id} actif={filtre === g.domaine.id} onClick={() => setFiltre(filtre === g.domaine.id ? null : g.domaine.id)} label={g.domaine.nom} n={g.fournisseurs.length} />
+          ))}
         </div>
-      </section>
-
-      {isAdmin && (
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>{editing ? "Modifier le fournisseur" : "Nouveau fournisseur"}</DialogTitle>
-              <DialogDescription>Renseignez les informations utiles à votre annuaire technique.</DialogDescription>
-            </DialogHeader>
-            <SupplierForm
-              key={editing?.id ?? "new"}
-              initial={editing}
-              onSubmit={async (s, pwd) => {
-                await upsert(s, pwd);
-                await refreshSecrets();
-                setOpen(false);
-              }}
-              onCancel={() => setOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
       )}
 
-      {isAdmin && (
-        <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Supprimer ce fournisseur ?</AlertDialogTitle>
-              <AlertDialogDescription>
-                {toDelete?.name} sera définitivement retiré de l'annuaire.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Annuler</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
-                  if (toDelete) remove(toDelete.id);
-                  setToDelete(null);
-                }}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                Supprimer
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+      {domaines.length === 0 ? (
+        <div className="panel mx-auto mt-10 max-w-lg p-6 text-center text-sm">
+          <h2 className="font-semibold">L'annuaire est vide</h2>
+          <p className="mt-2 text-muted-foreground">Commencez par créer les domaines (menuiserie alu, isolation, quincaillerie…), puis ajoutez les fournisseurs. Une sauvegarde peut aussi être importée depuis le pied de page.</p>
+          <Button className="mt-4 gap-1.5" onClick={() => setGererDomaines(true)}><Plus className="size-4" /> Créer un domaine</Button>
+        </div>
+      ) : visibles.length === 0 ? (
+        <p className="py-16 text-center text-sm text-muted-foreground">Aucun fournisseur ne correspond à « {q} ».</p>
+      ) : (
+        <div className="space-y-6">
+          {visibles.map((g) => (
+            <section key={g.domaine.id} className="panel overflow-hidden" aria-labelledby={`d-${g.domaine.id}`}>
+              <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
+                <h2 id={`d-${g.domaine.id}`} className="card-title">{g.domaine.nom} <span className="text-muted-foreground">· {g.fournisseurs.length}</span></h2>
+                <button className="text-xs text-muted-foreground hover:text-foreground" onClick={() => setEdition({ f: null, domaine: g.domaine.id })}>+ Ajouter ici</button>
+              </div>
+              {g.fournisseurs.length === 0 ? (
+                <p className="px-4 py-4 text-sm text-muted-foreground">Aucun fournisseur dans ce domaine.</p>
+              ) : (
+                <table className="tbl table-fixed">
+                  <colgroup><col className="w-[22%]" /><col className="w-[24%]" /><col className="w-[22%]" /><col /><col className="w-20" /></colgroup>
+                  <thead><tr><th className="pl-4">Fournisseur</th><th>Liens</th><th>Accès</th><th>Notes</th><th><span className="sr-only">Actions</span></th></tr></thead>
+                  <tbody>
+                    {g.fournisseurs.map((f) => (
+                      <tr key={f.id} className="group">
+                        <td className="pl-4 font-medium">{f.nom}</td>
+                        <td>
+                          <div className="flex items-center gap-3">
+                            {f.site ? (
+                              <a href={f.site} target="_blank" rel="noopener noreferrer" className="inline-flex min-w-0 items-center gap-1 underline-offset-2 hover:underline" title={f.site}>
+                                <ExternalLink className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{hote(f.site)}</span>
+                              </a>
+                            ) : <span className="text-muted-foreground">—</span>}
+                            {f.site_cao && (
+                              <a href={f.site_cao} target="_blank" rel="noopener noreferrer" className="inline-flex shrink-0 items-center gap-1 underline-offset-2 hover:underline" title={f.site_cao}>
+                                <Box className="size-3.5 text-muted-foreground" />CAO
+                              </a>
+                            )}
+                          </div>
+                        </td>
+                        <td><AccesCellule bloc={f.acces} nom={f.nom} /></td>
+                        <td className="truncate text-muted-foreground" title={f.notes}>{f.notes}</td>
+                        <td>
+                          <div className="flex justify-end opacity-60 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                            <Button size="icon" variant="ghost" className="size-8" onClick={() => setEdition({ f })} aria-label={`Modifier ${f.nom}`}><Pencil className="size-4" /></Button>
+                            <Button size="icon" variant="ghost" className="size-8 text-destructive hover:text-destructive" onClick={() => setASupprimer(f)} aria-label={`Supprimer ${f.nom}`}><Trash2 className="size-4" /></Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </section>
+          ))}
+        </div>
       )}
 
-      <Dialog open={!!mailFor} onOpenChange={(o) => !o && setMailFor(null)}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Générer un mail — {mailFor?.name}</DialogTitle>
-            <DialogDescription>
-              Renseignez le contexte chantier, choisissez un modèle puis copiez ou ouvrez dans Outlook.
-            </DialogDescription>
-          </DialogHeader>
-          {mailFor && <EmailGenerator supplier={mailFor} onClose={() => setMailFor(null)} />}
-        </DialogContent>
-      </Dialog>
-    </main>
+      <FournisseurDialog open={!!edition} onOpenChange={(o) => !o && setEdition(null)} initial={edition?.f ?? null} domaineParDefaut={edition?.domaine} />
+      <DomainesDialog open={gererDomaines} onOpenChange={setGererDomaines} />
+      <AlertDialog open={!!aSupprimer} onOpenChange={(o) => !o && setASupprimer(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer {aSupprimer?.nom} ?</AlertDialogTitle>
+            <AlertDialogDescription>Le fournisseur et son accès sont retirés de l'annuaire. Pensez à télécharger une sauvegarde avant les grands ménages.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-white hover:bg-destructive/90" onClick={() => { if (aSupprimer) supprimerFournisseur(aSupprimer.id); setASupprimer(null); }}>Supprimer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
+
+function Puce({ actif, onClick, label, n }: { actif: boolean; onClick: () => void; label: string; n: number }) {
+  return (
+    <button type="button" onClick={onClick} aria-pressed={actif}
+      className={`rounded-full border px-3 py-1 text-xs transition-colors ${actif ? "border-[var(--app-fill)] bg-[var(--app-fill)] text-[var(--app-on)]" : "border-border bg-card text-foreground hover:bg-muted"}`}>
+      {label} <span className={actif ? "opacity-80" : "text-muted-foreground"}>{n}</span>
+    </button>
   );
 }
