@@ -37,7 +37,7 @@ export function AccesCellule({ bloc, nom }: { bloc: Bloc | null; nom: string }) 
   if (erreur) return <span className="text-xs text-destructive">Illisible (autre phrase secrète)</span>;
   if (!acces) return <span className="text-xs text-muted-foreground">…</span>;
   return (
-    <div className="grid grid-cols-[1fr_auto] items-center gap-x-1 font-mono text-xs">
+    <div className="inline-grid max-w-full grid-cols-[minmax(0,max-content)_auto] items-center gap-x-2 font-mono text-xs">
       <span className="truncate" title={acces.identifiant}>{acces.identifiant || "—"}</span>
       <span className="flex">
         {acces.identifiant && <button type="button" className={btn} onClick={() => copier(acces.identifiant, "Identifiant")} aria-label={`Copier l'identifiant de ${nom}`}><Copy className="size-3.5" /></button>}
