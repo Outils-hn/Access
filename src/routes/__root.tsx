@@ -11,23 +11,24 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { AuthProvider } from "@/lib/auth-context";
+import { Toaster } from "sonner";
+import { Shell } from "@/components/access/Shell";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Page introuvable</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          Cette page n'existe pas ou a été déplacée.
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Go home
+            Retour à l'annuaire
           </Link>
         </div>
       </div>
@@ -46,10 +47,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+          La page n'a pas pu s'afficher
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Une erreur est survenue. Réessayez ou revenez à l'annuaire.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -59,13 +60,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Try again
+            Réessayer
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            Go home
+            Retour à l'annuaire
           </a>
         </div>
       </div>
@@ -80,22 +81,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "robots", content: "noindex, nofollow" },
       { name: "googlebot", content: "noindex, nofollow" },
-      { title: "Access ·" },
-      { name: "description", content: "Liste fournisseurs" },
-      { property: "og:title", content: "Access ·" },
-      { property: "og:description", content: "Liste fournisseurs" },
+      { title: "Access — annuaire des fournisseurs" },
+      { name: "description", content: "Annuaire des fournisseurs de façade" },
+      { property: "og:title", content: "Access — annuaire des fournisseurs" },
+      { property: "og:description", content: "Annuaire des fournisseurs de façade" },
       { property: "og:type", content: "website" },
-      { name: "twitter:title", content: "Access ·" },
-      { name: "twitter:description", content: "Liste fournisseurs" },
+      { name: "twitter:title", content: "Access — annuaire des fournisseurs" },
+      { name: "twitter:description", content: "Annuaire des fournisseurs de façade" },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/35d8dcab-d647-4cc9-907e-ab394473615c/id-preview-6821a80d--630d67fe-d11c-4a74-b7ea-d18460c3e49a.lovable.app-1783235121178.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/35d8dcab-d647-4cc9-907e-ab394473615c/id-preview-6821a80d--630d67fe-d11c-4a74-b7ea-d18460c3e49a.lovable.app-1783235121178.png" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" },
     ],
   }),
   shellComponent: RootShell,
@@ -106,13 +107,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
+    <html lang="fr" suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme')||'dark';var r=document.documentElement;r.classList.toggle('dark',t==='dark');r.style.colorScheme=t;}catch(e){}})();`,
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: "try{if(localStorage.getItem('access-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}" }} />
         <HeadContent />
       </head>
       <body>
@@ -128,10 +125,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <Shell>
         <Outlet />
-      </AuthProvider>
+      </Shell>
+      <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );
 }
