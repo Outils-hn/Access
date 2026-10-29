@@ -208,6 +208,7 @@ try {
   ok(copie.includes("Sika") && !/Bureau-42|Alice-perso/.test(copie), "copie locale hors ligne sans les mots de passe");
 
   // 8. Accessibilite, theme sombre, selecteur
+  await p.waitForTimeout(800); // fin de l'animation de fermeture des fenetres
   const axe = await new AxeBuilder({ page: p }).withTags(["wcag2a", "wcag2aa"]).analyze();
   ok(axe.violations.length === 0, `accessibilité : ${axe.violations.length} problème(s)${axe.violations.map((v) => ` [${v.id}: ${v.nodes.length}]`).join("")}`);
   const p3 = await page({ dark: true });
