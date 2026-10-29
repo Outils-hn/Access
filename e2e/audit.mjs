@@ -13,7 +13,7 @@ async function real(path) {
     const r = await fetch(SB + path, { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } });
     const t = await r.text();
     return { status: r.status, body: t };
-  } catch (e) { return { status: 0, body: String(e) }; }
+  } catch (e) { return { status: 0, body: String(e) + " " + String(e.cause?.code || e.cause) }; }
 }
 const st = await real("/auth/v1/settings");
 try {

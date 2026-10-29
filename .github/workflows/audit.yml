@@ -25,6 +25,7 @@ jobs:
           mkdir -p out
           (npx vite dev --port 8080 --host 127.0.0.1 > dev.log 2>&1 &)
           for i in $(seq 1 60); do curl -sf http://127.0.0.1:8080/ >/dev/null && break; sleep 2; done
+          curl -sS -m 15 -o /dev/null -w "curl settings %{http_code}\n" "https://$SB_REF.supabase.co/auth/v1/settings" -H "apikey: $SB_KEY" > out/curl.txt 2>&1 || true
           node e2e/audit.mjs out || true
           tail -30 dev.log > out/dev-log.txt
       - name: Publier
