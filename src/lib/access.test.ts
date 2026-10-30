@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { correspond, hote, normaliserUrl, sansAccents } from "./recherche";
+import { compterFiches, correspond, hote, normaliserUrl, sansAccents } from "./recherche";
 import { exporter, planifier } from "./sauvegarde";
 import { grouper, type Annuaire } from "./donnees";
 
@@ -54,5 +54,15 @@ describe("sauvegarde", () => {
   });
   it("ne contient jamais d'acces", () => {
     expect(JSON.stringify(exporter(base))).not.toMatch(/mot_de_passe|identifiant/);
+  });
+});
+
+describe("fiches Index", () => {
+  it("compte les fiches d'un fournisseur, sans accents ni majuscules", () => {
+    const f = ["Schüco International KG", "SCHUCO", "Jansen AG", "", "Flumroc"];
+    expect(compterFiches("Schüco", f)).toBe(2);
+    expect(compterFiches("Jansen", f)).toBe(1);
+    expect(compterFiches("Sika", f)).toBe(0);
+    expect(compterFiches("", f)).toBe(0);
   });
 });

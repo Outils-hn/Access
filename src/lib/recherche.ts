@@ -24,3 +24,13 @@ export function normaliserUrl(s: string): string {
   if (!t) return "";
   return /^https?:\/\//i.test(t) ? t : `https://${t}`;
 }
+
+/** Nombre de fiches Index d'un fournisseur : tous les mots de son nom dans le champ « fournisseur » de la fiche. */
+export function compterFiches(nom: string, fournisseursDesFiches: string[]): number {
+  const mots = sansAccents(nom).split(/[\s\-–&.,()]+/).filter((m) => m.length > 1);
+  if (!mots.length) return 0;
+  return fournisseursDesFiches.filter((s) => {
+    const t = sansAccents(s ?? "");
+    return mots.every((m) => t.includes(m));
+  }).length;
+}

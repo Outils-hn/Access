@@ -21,6 +21,8 @@ const parId = (id) => Object.entries(COMPTES).find(([, c]) => c.id === id);
 
 // ---- Base simulee ----
 const etat = { access_domaines: [], access_fournisseurs: [], access_acces: [], ecritures: [] };
+// Fiches Index (table « products », lecture libre)
+const FICHES = [{ supplier: "Schüco International KG" }, { supplier: "SCHUCO" }, { supplier: "Flumroc AG" }];
 let n = 0;
 const uid = () => `00000000-0000-4000-8000-${String(++n).padStart(12, "0")}`;
 function seed() {
@@ -57,6 +59,7 @@ async function brancher(ctx) {
     if (u.pathname === "/auth/v1/user") { const e = parId(moi); return e ? json({ id: moi, email: e[0], aud: "authenticated", role: "authenticated" }) : json({ msg: "no" }, 401); }
     if (u.pathname === "/rest/v1/rpc/is_approved") return json(valide(moi));
     const table = u.pathname.replace("/rest/v1/", "");
+    if (table === "products") return json(FICHES);
     if (!(table in etat)) return json([]);
     const m = req.method();
     if (m === "GET") return json(etat[table].filter((row) => visible(table, moi, row)));
@@ -120,9 +123,12 @@ try {
   const rech = p.getByLabel("Rechercher");
   await rech.fill("schuco");
   ok((await p.locator("tbody tr").count()) === 1, "recherche « schuco » trouve Schüco (sans tréma)");
+  const lienFiches = p.locator("tr", { hasText: "Schüco" }).getByRole("link", { name: "2 fiches" });
+  ok(await lienFiches.isVisible() && (await lienFiches.getAttribute("href")) === "https://index-hn.lovable.app/?q=Sch%C3%BCco", "lien « 2 fiches » vers Index (recherche Schüco)");
   await rech.press("Escape");
   await p.getByRole("button", { name: /^Acier/ }).click();
   ok((await p.locator("tbody tr").count()) === 1, "filtre par puce de domaine");
+  ok(!(await p.locator("tr", { hasText: "Jansen" }).getByRole("link", { name: /fiche/ }).count()), "pas de lien « fiches » sans fiche dans Index");
   await p.getByRole("button", { name: /^Tous/ }).click();
 
   // 3. Mauvais mot de passe, puis compte en attente
@@ -202,6 +208,7 @@ try {
   ok(copie.includes("Sika") && !/Bureau-42|Alice-perso/.test(copie), "copie locale hors ligne sans les mots de passe");
 
   // 8. Accessibilite, theme sombre, selecteur
+  await p.waitForTimeout(800); // fin de l'animation de fermeture des fenetres
   const axe = await new AxeBuilder({ page: p }).withTags(["wcag2a", "wcag2aa"]).analyze();
   ok(axe.violations.length === 0, `accessibilité : ${axe.violations.length} problème(s)${axe.violations.map((v) => ` [${v.id}: ${v.nodes.length}]`).join("")}`);
   const p3 = await page({ dark: true });
