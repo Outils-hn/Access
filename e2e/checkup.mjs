@@ -132,7 +132,7 @@ try {
   await p.getByLabel("Mot de passe", { exact: true }).fill(MDP);
   await p.getByRole("dialog").getByRole("button", { name: "Se connecter" }).click();
   await p.waitForTimeout(1200);
-  ok(await p.getByText("Compte en attente de validation dans Index").isVisible(), "compte non validé : « en attente »");
+  ok(await p.getByText("Compte en attente de validation").isVisible(), "compte non validé : « en attente »");
   ok(!(await p.getByRole("button", { name: "Nouveau fournisseur" }).count()), "compte non validé : pas de modification");
   await p.getByRole("button", { name: "Déconnexion" }).click();
   await p.waitForTimeout(600);
