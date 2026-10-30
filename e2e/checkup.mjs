@@ -188,7 +188,7 @@ try {
   await p.getByRole("button", { name: "Domaines" }).click();
   await shot(p, "07-domaines");
   await p.keyboard.press("Escape");
-  await p.getByRole("button", { name: "Sauvegarde" }).click();
+  await p.getByRole("button", { name: "Sauvegarde", exact: true }).click();
   const dl = p.waitForEvent("download");
   await p.getByRole("button", { name: "Télécharger" }).click();
   const brut = fs.readFileSync(await (await dl).path(), "utf8");
@@ -210,7 +210,7 @@ try {
   const axe2 = await new AxeBuilder({ page: p3 }).withTags(["wcag2a", "wcag2aa"]).analyze();
   ok(axe2.violations.length === 0, `accessibilité (sombre) : ${axe2.violations.length} problème(s)${axe2.violations.map((v) => ` [${v.id}: ${v.nodes.length}]`).join("")}`);
   await p3.getByRole("button", { name: "Changer d'application" }).click();
-  ok((await p3.getByRole("menuitem").count()) === 7, "sélecteur : 7 applis");
+  ok((await p3.getByRole("menuitem").count()) === 9, "sélecteur : Accueil + 8 applis");
 } catch (e) {
   ok(false, `arret du check-up : ${e.message.split("\n")[0]}`);
 }
