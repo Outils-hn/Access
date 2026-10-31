@@ -124,7 +124,7 @@ try {
   await rech.fill("schuco");
   ok((await p.locator("tbody tr").count()) === 1, "recherche « schuco » trouve Schüco (sans tréma)");
   const lienFiches = p.locator("tr", { hasText: "Schüco" }).getByRole("link", { name: "2 fiches" });
-  ok(await lienFiches.isVisible() && (await lienFiches.getAttribute("href")) === "https://index-hn.lovable.app/?q=Sch%C3%BCco", "lien « 2 fiches » vers Index (recherche Schüco)");
+  ok(await lienFiches.isVisible() && (await lienFiches.getAttribute("href")) === "https://outils-hn.github.io/Index/?q=Sch%C3%BCco", "lien « 2 fiches » vers Index (recherche Schüco)");
   await rech.press("Escape");
   await p.getByRole("button", { name: /^Acier/ }).click();
   ok((await p.locator("tbody tr").count()) === 1, "filtre par puce de domaine");
