@@ -4,7 +4,11 @@ import { db } from "@/lib/base";
 import { useCompte } from "@/lib/compte";
 
 export type Domaine = { id: string; nom: string; ordre: number };
-export type Fournisseur = { id: string; nom: string; domaine_id: string; site: string; site_cao: string; notes: string; updated_at?: string };
+export type Fournisseur = {
+  id: string; nom: string; domaine_id: string; site: string; site_cao: string; notes: string;
+  /** Contact general (coordonnees publiques du fournisseur) */
+  email: string; telephone: string; email_technique: string; updated_at?: string;
+};
 export type Acces = { id: string; fournisseur_id: string; proprietaire: string | null; identifiant: string; mot_de_passe: string };
 export type Annuaire = { domaines: Domaine[]; fournisseurs: Fournisseur[]; horsLigne?: string };
 
@@ -15,7 +19,7 @@ async function charger(): Promise<Annuaire> {
   try {
     const [d, f] = await Promise.all([
       db.from("access_domaines").select("id,nom,ordre").order("ordre").order("nom"),
-      db.from("access_fournisseurs").select("id,nom,domaine_id,site,site_cao,notes,updated_at").order("nom"),
+      db.from("access_fournisseurs").select("id,nom,domaine_id,site,site_cao,notes,email,telephone,email_technique,updated_at").order("nom"),
     ]);
     const err = d.error || f.error;
     if (err) throw err;
@@ -77,7 +81,7 @@ function message(e: { message?: string; code?: string }) {
   if (e.code === "42501" || /row-level security/i.test(e.message ?? "")) return "Modification refusée : compte pas encore validé dans Index.";
   if (e.code === "23505") return "Ce nom existe déjà.";
   if (e.code === "23503") return "Ce domaine contient encore des fournisseurs.";
-  if (e.code === "23514") return "Valeur refusée : vérifiez les liens (https://…) et la longueur des champs.";
+  if (e.code === "23514") return "Valeur refusée : vérifiez les liens (https://…), l'email (nom@domaine.ch), le téléphone et la longueur des champs.";
   return "Erreur : " + (e.message ?? "inconnue");
 }
 

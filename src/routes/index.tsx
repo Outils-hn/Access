@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Box, ExternalLink, FileText, Pencil, Plus, Search, Settings2, Trash2 } from "lucide-react";
+import { Box, ExternalLink, FileText, Mail, Phone, Wrench, Pencil, Plus, Search, Settings2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,7 +10,7 @@ import {
 import { grouper, useAcces, useActions, useAnnuaire, useFichesIndex, type Fournisseur } from "@/lib/donnees";
 import { INDEX_URL } from "@/lib/base";
 import { useCompte } from "@/lib/compte";
-import { compterFiches, correspond, hote } from "@/lib/recherche";
+import { compterFiches, correspond, hote, lienDemande, lienTel } from "@/lib/recherche";
 import { AccesCellule } from "@/components/access/AccesCellule";
 import { FournisseurDialog } from "@/components/access/FournisseurDialog";
 import { DomainesDialog } from "@/components/access/DomainesDialog";
@@ -116,8 +116,8 @@ function Annuaire() {
                 <p className="px-4 py-4 text-sm text-muted-foreground">Aucun fournisseur dans ce domaine.</p>
               ) : (
                 <table className="tbl table-fixed">
-                  <colgroup><col className="w-[22%]" /><col className="w-[24%]" /><col className="w-[22%]" /><col /><col className="w-20" /></colgroup>
-                  <thead><tr><th className="pl-4">Fournisseur</th><th>Liens</th><th>Accès</th><th>Notes</th><th><span className="sr-only">Actions</span></th></tr></thead>
+                  <colgroup><col className="w-[17%]" /><col className="w-[21%]" /><col className="w-[22%]" /><col className="w-[19%]" /><col /><col className="w-20" /></colgroup>
+                  <thead><tr><th className="pl-4">Fournisseur</th><th>Liens</th><th>Contact</th><th>Accès</th><th>Notes</th><th><span className="sr-only">Actions</span></th></tr></thead>
                   <tbody>
                     {g.fournisseurs.map((f) => (
                       <tr key={f.id} className="group">
@@ -137,6 +137,7 @@ function Annuaire() {
                             <LienFiches nom={f.nom} n={compterFiches(f.nom, fichesIndex)} />
                           </div>
                         </td>
+                        <td><Contact f={f} /></td>
                         <td><AccesCellule bureau={acces.bureau(f.id)} perso={acces.perso(f.id)} nom={f.nom} connecte={valide} /></td>
                         <td className="truncate text-muted-foreground" title={f.notes}>{f.notes}</td>
                         <td>
@@ -190,5 +191,18 @@ function LienFiches({ nom, n }: { nom: string; n: number }) {
       className="inline-flex shrink-0 items-center gap-1 underline-offset-2 hover:underline" title={`Ouvrir les fiches ${nom} dans Index`}>
       <FileText className="size-3.5 text-muted-foreground" />{n} fiche{n > 1 ? "s" : ""}
     </a>
+  );
+}
+
+/** Contact general du fournisseur : email (objet « Demande d'information » pre-rempli), telephone, service technique. */
+function Contact({ f }: { f: Fournisseur }) {
+  if (!f.email && !f.telephone && !f.email_technique) return <span className="text-muted-foreground">—</span>;
+  const lien = "inline-flex min-w-0 max-w-full items-center gap-1.5 underline-offset-2 hover:underline";
+  return (
+    <div className="flex min-w-0 flex-col gap-0.5 text-[13px]">
+      {f.email && <a href={lienDemande(f.email, f.nom)} className={lien} title={`Écrire à ${f.email}`}><Mail className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.email}</span></a>}
+      {f.telephone && <a href={lienTel(f.telephone)} className={lien} title={`Appeler ${f.nom}`}><Phone className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate tabular-nums">{f.telephone}</span></a>}
+      {f.email_technique && <a href={lienDemande(f.email_technique, f.nom)} className={lien} title={`Service technique : ${f.email_technique}`}><Wrench className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.email_technique}</span></a>}
+    </div>
   );
 }
