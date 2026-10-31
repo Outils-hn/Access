@@ -16,6 +16,7 @@ export function exporter(a: Annuaire, maintenant = new Date()): FichierAccess {
     domaines: a.domaines.map((d) => ({ nom: d.nom, ordre: d.ordre })),
     fournisseurs: a.fournisseurs.map((f) => ({
       nom: f.nom, domaine: nomDomaine.get(f.domaine_id) ?? "Sans domaine", site: f.site, site_cao: f.site_cao, notes: f.notes,
+      email: f.email ?? "", telephone: f.telephone ?? "", email_technique: f.email_technique ?? "",
     })),
   };
 }
@@ -52,7 +53,10 @@ export function planifier(p: unknown, base: Annuaire): PlanImport {
   const aAjouter: PlanImport["aAjouter"] = [];
   const aMettreAJour: PlanImport["aMettreAJour"] = [];
   for (const x of f.fournisseurs) {
-    const ligne = { nom: x.nom.trim(), domaine: x.domaine.trim(), site: x.site ?? "", site_cao: x.site_cao ?? "", notes: x.notes ?? "" };
+    const ligne = {
+      nom: x.nom.trim(), domaine: x.domaine.trim(), site: x.site ?? "", site_cao: x.site_cao ?? "", notes: x.notes ?? "",
+      email: x.email ?? "", telephone: x.telephone ?? "", email_technique: x.email_technique ?? "",
+    };
     const existant = parNom.get(cle(x.nom));
     if (existant) aMettreAJour.push({ ...ligne, id: existant.id }); else aAjouter.push(ligne);
   }

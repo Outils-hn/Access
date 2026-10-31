@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compterFiches, correspond, hote, normaliserUrl, sansAccents } from "./recherche";
+import { compterFiches, correspond, emailOk, hote, lienDemande, lienTel, normaliserUrl, sansAccents, telephoneOk } from "./recherche";
 import { exporter, planifier } from "./sauvegarde";
 import { grouper, type Annuaire } from "./donnees";
 
@@ -25,8 +25,8 @@ describe("recherche", () => {
 const base: Annuaire = {
   domaines: [{ id: "d2", nom: "Acier", ordre: 2 }, { id: "d1", nom: "Menuiserie alu", ordre: 1 }],
   fournisseurs: [
-    { id: "f1", nom: "Schüco", domaine_id: "d1", site: "", site_cao: "", notes: "" },
-    { id: "f2", nom: "Jansen", domaine_id: "d2", site: "", site_cao: "", notes: "" },
+    { id: "f1", nom: "Schüco", domaine_id: "d1", site: "", site_cao: "", notes: "", email: "", telephone: "", email_technique: "" },
+    { id: "f2", nom: "Jansen", domaine_id: "d2", site: "", site_cao: "", notes: "", email: "", telephone: "", email_technique: "" },
   ],
 };
 
@@ -64,5 +64,23 @@ describe("fiches Index", () => {
     expect(compterFiches("Jansen", f)).toBe(1);
     expect(compterFiches("Sika", f)).toBe(0);
     expect(compterFiches("", f)).toBe(0);
+  });
+});
+
+describe("contact", () => {
+  it("valide email et telephone (vides acceptes)", () => {
+    expect(emailOk("")).toBe(true);
+    expect(emailOk("info@schueco.ch")).toBe(true);
+    expect(emailOk("info@schueco")).toBe(false);
+    expect(telephoneOk("+41 21 123 45 67")).toBe(true);
+    expect(telephoneOk("021/123.45.67")).toBe(true);
+    expect(telephoneOk("appeler Marc")).toBe(false);
+  });
+  it("liens tel: et mailto: avec objet", () => {
+    expect(lienTel("+41 (0)21 123 45 67")).toBe("tel:+41211234567");
+    expect(lienDemande(" info@a.ch ", "Schüco")).toBe("mailto:info@a.ch?subject=Demande%20d'information%20%E2%80%93%20Sch%C3%BCco");
+  });
+  it("la recherche trouve aussi l'email", () => {
+    expect(correspond({ nom: "X", email: "info@flumroc.ch" }, "Isolation", "flumroc")).toBe(true);
   });
 });

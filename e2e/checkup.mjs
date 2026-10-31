@@ -153,6 +153,10 @@ try {
   await p.locator("#b-mdp").fill("Bureau-42!");
   await p.locator("#p-id").fill("alice.perso");
   await p.locator("#p-mdp").fill("Alice-perso-7");
+  await p.locator("#f-email").fill("info@sika");
+  ok(await p.getByRole("button", { name: "Ajouter", exact: true }).isDisabled() && await p.getByText("Email invalide").isVisible(), "email invalide refusé");
+  await p.locator("#f-email").fill("info@sika.ch");
+  await p.locator("#f-tel").fill("+41 58 436 40 40");
   await shot(p, "04-formulaire");
   await p.getByRole("button", { name: "Ajouter", exact: true }).click();
   await p.waitForTimeout(1500);
@@ -189,6 +193,9 @@ try {
   await p2.getByRole("button", { name: "Déconnexion" }).click();
   await p2.waitForTimeout(800);
   ok(!(await p2.getByText("bureau@exemple.ch").count()) && await p2.getByText("Connexion requise").first().isVisible(), "après déconnexion : accès masqués");
+  const mail = p2.locator("tr", { hasText: "Sika" }).getByRole("link", { name: "info@sika.ch" });
+  ok(await mail.isVisible() && /^mailto:info@sika\.ch\?subject=Demande%20d'information/.test(await mail.getAttribute("href")), "sans compte : email du fournisseur visible, objet pré-rempli");
+  ok((await p2.locator("tr", { hasText: "Sika" }).getByRole("link", { name: "+41 58 436 40 40" }).getAttribute("href")) === "tel:+41584364040", "téléphone cliquable");
 
   // 7. Domaines, sauvegarde, a propos (Alice)
   await p.getByRole("button", { name: "Domaines" }).click();
