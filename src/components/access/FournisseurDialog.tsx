@@ -84,7 +84,7 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="max-h-[92vh] max-w-xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{initial ? `Modifier ${initial.nom}` : "Nouveau fournisseur"}</DialogTitle>
           <DialogDescription className="sr-only">Nom, domaine, liens et accès du fournisseur</DialogDescription>
