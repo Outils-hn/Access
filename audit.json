@@ -1,0 +1,257 @@
+{
+  "constats": [],
+  "erreurs": [],
+  "metriques": {
+    "mesures:vide": {
+      "titre": "Access — annuaire des fournisseurs",
+      "lang": "fr",
+      "viewportMeta": true,
+      "h1": 1,
+      "h2": 1,
+      "debordementHorizontal": false,
+      "largeurDoc": 1440,
+      "largeurFenetre": 1440,
+      "champs": 1,
+      "champsSansEtiquette": [],
+      "interactifs": 6,
+      "sansNom": [],
+      "cibles_sous_24px": 4,
+      "taillesTexte": {
+        "10": 1,
+        "12": 5,
+        "13": 1,
+        "14": 4,
+        "16": 1,
+        "17": 1
+      },
+      "tailleMin": 10,
+      "octetsTransferes": 865099,
+      "octetsJS": 779636,
+      "nbRequetes": 16,
+      "domContentLoaded": 132,
+      "load": 179,
+      "chargement_ms": 880
+    },
+    "axe:vide": [
+      {
+        "regle": "label-content-name-mismatch",
+        "impact": "serious",
+        "aide": "Elements must have their visible text as part of their accessible name",
+        "occurrences": 1,
+        "exemple": "<button type=\"button\" id=\"radix-_r_0_\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" class=\"flex items-center gap-1 rounded",
+        "cible": "#radix-_r_0_"
+      }
+    ],
+    "vide:texte": "Access Annuaire des fournisseurs Lecture seule Se connecter / 0 fournisseur L'annuaire est vide Commencez par créer les domaines (menuiserie alu, isolation, quincaillerie…), puis ajoutez les fournisseurs. Une sauvegarde peut aussi être importée depuis le pied de page. Connectez-vous avec un compte Index validé pour le remplir. Access v2.4 · Conçu par Hugo N. · 2026 · Sauvegarde · Suggestion / bug",
+    "mesures:visiteur": {
+      "titre": "Access — annuaire des fournisseurs",
+      "lang": "fr",
+      "viewportMeta": true,
+      "h1": 1,
+      "h2": 3,
+      "debordementHorizontal": false,
+      "largeurDoc": 1440,
+      "largeurFenetre": 1440,
+      "champs": 1,
+      "champsSansEtiquette": [],
+      "interactifs": 16,
+      "sansNom": [],
+      "cibles_sous_24px": 10,
+      "taillesTexte": {
+        "10": 1,
+        "11": 24,
+        "12": 16,
+        "13": 1,
+        "14": 15,
+        "16": 1,
+        "17": 1
+      },
+      "tailleMin": 10,
+      "octetsTransferes": 865099,
+      "octetsJS": 779636,
+      "nbRequetes": 16,
+      "domContentLoaded": 102,
+      "load": 141,
+      "chargement_ms": 841
+    },
+    "axe:visiteur": [
+      {
+        "regle": "label-content-name-mismatch",
+        "impact": "serious",
+        "aide": "Elements must have their visible text as part of their accessible name",
+        "occurrences": 1,
+        "exemple": "<button type=\"button\" id=\"radix-_r_0_\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" class=\"flex items-center gap-1 rounded",
+        "cible": "#radix-_r_0_"
+      }
+    ],
+    "focus": {
+      "total": 24,
+      "sansIndicateur": 0,
+      "exemples": []
+    },
+    "visiteur:texte": "Access Annuaire des fournisseurs Lecture seule Se connecter / 3 fournisseurs Tous 3 Menuiserie alu 1 Acier 1 Isolation 1 MENUISERIE ALU · 1 FOURNISSEUR LIENS CONTACT ACCÈS NOTES ACTIONS Schüco schueco.com CAO 2 fiches — Connexion requise Délais 6 semaines ACIER · 1 FOURNISSEUR LIENS CONTACT ACCÈS NOTES ACTIONS Jansen jansen.com — Connexion requise ISOLATION · 1 FOURNISSEUR LIENS CONTACT ACCÈS NOTES ACTIONS Flumroc flumroc.ch 1 fiche — Connexion requise Fiches techniques sur le site Access v2.4 · Conçu par Hugo N. · 2026 · Sauvegarde · Suggestion / bug",
+    "tabs-jusqu-a-recherche": 15,
+    "recherche:accent": {
+      "lignes": 1,
+      "texte": "ACCÈS NOTES ACTIONS Schüco schueco.com CAO 2 fiches — Connexion requise Délais 6 semaines Access v2.4 · Conçu par Hugo N. · 2026 · Sauvegarde · Suggestion / bug"
+    },
+    "recherche:partiel": {
+      "lignes": 1,
+      "texte": "ACCÈS NOTES ACTIONS Schüco schueco.com CAO 2 fiches — Connexion requise Délais 6 semaines Access v2.4 · Conçu par Hugo N. · 2026 · Sauvegarde · Suggestion / bug"
+    },
+    "recherche:rien": {
+      "lignes": 0,
+      "texte": "r Tous 3 Menuiserie alu 1 Acier 1 Isolation 1 Aucun fournisseur ne correspond à « zzzz ». Access v2.4 · Conçu par Hugo N. · 2026 · Sauvegarde · Suggestion / bug"
+    },
+    "recherche:balise": {
+      "lignes": 0,
+      "texte": "us 3 Menuiserie alu 1 Acier 1 Isolation 1 Aucun fournisseur ne correspond à « <b>x</b> ». Access v2.4 · Conçu par Hugo N. · 2026 · Sauvegarde · Suggestion / bug"
+    },
+    "recherche:espaces": {
+      "lignes": 3,
+      "texte": "OTES ACTIONS Flumroc flumroc.ch 1 fiche — Connexion requise Fiches techniques sur le site Access v2.4 · Conçu par Hugo N. · 2026 · Sauvegarde · Suggestion / bug"
+    },
+    "mauvais-mdp": "Connexion Avec votre compte Index : mêmes email et mot de passe. Email Mot de passe Email ou mot de passe incorrect. Pas encore de compte ? Créer un compte dans Index. Mot de passe oublié : depuis Index. Annuler Se connecter Close",
+    "formulaire:champs": [
+      "Nom *",
+      "",
+      "Site",
+      "Site CAO",
+      "Email",
+      "Téléphone",
+      "Email du service technique (facultatif)",
+      "Identifiant",
+      "Mot de passe",
+      "Identifiant",
+      "Mot de passe",
+      "Notes"
+    ],
+    "formulaire:vide": "oordonnées publiques du fournisseur, visibles par tous (pas de contact nominatif). ACCÈS DU BUREAU Identifiant Mot de passe Visible par tous les comptes validés. MON ACCÈS PERSO Identifiant Mot de passe Visible par vous seul. Laisser vide si vous utilisez celui du bureau. Notes Annuler Ajouter Close",
+    "formulaire:site-invalide": "oordonnées publiques du fournisseur, visibles par tous (pas de contact nominatif). ACCÈS DU BUREAU Identifiant Mot de passe Visible par tous les comptes validés. MON ACCÈS PERSO Identifiant Mot de passe Visible par vous seul. Laisser vide si vous utilisez celui du bureau. Notes Annuler Ajouter Close",
+    "formulaire:doublon": "oordonnées publiques du fournisseur, visibles par tous (pas de contact nominatif). ACCÈS DU BUREAU Identifiant Mot de passe Visible par tous les comptes validés. MON ACCÈS PERSO Identifiant Mot de passe Visible par vous seul. Laisser vide si vous utilisez celui du bureau. Notes Annuler Ajouter Close",
+    "volume:600-fournisseurs": {
+      "ms": 2401,
+      "lignes": 603
+    },
+    "volume:recherche-ms": 392,
+    "sauvegarde:texte": "Sauvegarde Un fichier avec tous les domaines et fournisseurs. Les identifiants des sites n'y sont jamais inclus. Télécharger Importer… Close",
+    "boutons": "Télécharger | Importer… | Close",
+    "hors-ligne:texte": "Access Annuaire des fournisseurs Lecture seule Se connecter Chargement… Access v2.4 · Conçu par Hugo N. · 2026 · Sauvegarde · Suggestion / bug",
+    "mesures:mobile": {
+      "titre": "Access — annuaire des fournisseurs",
+      "lang": "fr",
+      "viewportMeta": true,
+      "h1": 1,
+      "h2": 3,
+      "debordementHorizontal": true,
+      "largeurDoc": 447,
+      "largeurFenetre": 390,
+      "champs": 1,
+      "champsSansEtiquette": [],
+      "interactifs": 614,
+      "sansNom": [],
+      "cibles_sous_24px": 607,
+      "taillesTexte": {
+        "10": 1,
+        "11": 24,
+        "12": 616,
+        "13": 1,
+        "14": 1899,
+        "16": 1,
+        "17": 1
+      },
+      "tailleMin": 10,
+      "octetsTransferes": 865099,
+      "octetsJS": 779636,
+      "nbRequetes": 16,
+      "domContentLoaded": 96,
+      "load": 134,
+      "chargement_ms": 1391
+    },
+    "axe:mobile": [
+      {
+        "regle": "color-contrast",
+        "impact": "serious",
+        "aide": "Elements must meet minimum color contrast ratio thresholds",
+        "occurrences": 1,
+        "exemple": "<span class=\"opacity-80\">603</span>",
+        "cible": ".opacity-80"
+      },
+      {
+        "regle": "label-content-name-mismatch",
+        "impact": "serious",
+        "aide": "Elements must have their visible text as part of their accessible name",
+        "occurrences": 1,
+        "exemple": "<button type=\"button\" id=\"radix-_r_0_\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" class=\"flex items-center gap-1 rounded",
+        "cible": "#radix-_r_0_"
+      }
+    ],
+    "mesures:tablette": {
+      "titre": "Access — annuaire des fournisseurs",
+      "lang": "fr",
+      "viewportMeta": true,
+      "h1": 1,
+      "h2": 3,
+      "debordementHorizontal": false,
+      "largeurDoc": 768,
+      "largeurFenetre": 768,
+      "champs": 1,
+      "champsSansEtiquette": [],
+      "interactifs": 765,
+      "sansNom": [],
+      "cibles_sous_24px": 759,
+      "taillesTexte": {
+        "10": 1,
+        "11": 24,
+        "12": 616,
+        "13": 1,
+        "14": 2050,
+        "16": 1,
+        "17": 1
+      },
+      "tailleMin": 10,
+      "octetsTransferes": 865099,
+      "octetsJS": 779636,
+      "nbRequetes": 16,
+      "domContentLoaded": 111,
+      "load": 151,
+      "chargement_ms": 1450
+    },
+    "axe:tablette": [
+      {
+        "regle": "color-contrast",
+        "impact": "serious",
+        "aide": "Elements must meet minimum color contrast ratio thresholds",
+        "occurrences": 1,
+        "exemple": "<span class=\"opacity-80\">603</span>",
+        "cible": ".opacity-80"
+      },
+      {
+        "regle": "label-content-name-mismatch",
+        "impact": "serious",
+        "aide": "Elements must have their visible text as part of their accessible name",
+        "occurrences": 1,
+        "exemple": "<button type=\"button\" id=\"radix-_r_0_\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" class=\"flex items-center gap-1 rounded",
+        "cible": "#radix-_r_0_"
+      }
+    ],
+    "axe:sombre": [
+      {
+        "regle": "color-contrast",
+        "impact": "serious",
+        "aide": "Elements must meet minimum color contrast ratio thresholds",
+        "occurrences": 1,
+        "exemple": "<span class=\"opacity-80\">603</span>",
+        "cible": ".opacity-80"
+      },
+      {
+        "regle": "label-content-name-mismatch",
+        "impact": "serious",
+        "aide": "Elements must have their visible text as part of their accessible name",
+        "occurrences": 1,
+        "exemple": "<button type=\"button\" id=\"radix-_r_0_\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" class=\"flex items-center gap-1 rounded",
+        "cible": "#radix-_r_0_"
+      }
+    ]
+  }
+}
