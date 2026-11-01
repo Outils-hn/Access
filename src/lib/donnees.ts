@@ -38,7 +38,7 @@ async function charger(): Promise<Annuaire> {
 
 export function useAnnuaire() {
   const q = useQuery({ queryKey: ["access", "annuaire"], queryFn: charger, staleTime: 30_000, retry: 1 });
-  return { ...(q.data ?? vide), chargement: q.isLoading, erreur: q.error as Error | null };
+  return { ...(q.data ?? vide), chargement: q.isLoading, erreur: q.error as Error | null, recharger: () => q.refetch() };
 }
 
 /** Fournisseur de chaque fiche Index active (meme base : lecture libre), pour le lien « Fiches ». */

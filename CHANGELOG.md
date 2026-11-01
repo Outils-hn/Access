@@ -4,6 +4,16 @@ Le numéro de version se met à jour dans `src/lib/version.ts` (pied de page et 
 
 Chaque version qui change quelque chose de visible pour l'équipe a une puce « Nouveauté : … », en langage courant : c'est la seule phrase affichée sur la page « Nouveautés » de l'Accueil.
 
+## 2.6 — 1er novembre 2026
+
+- Nouveauté : sur téléphone, l'annuaire s'affiche en cartes et une adresse de site invalide est signalée avant l'enregistrement.
+- Le site et le site CAO sont vérifiés à la saisie : message sous le champ, enregistrement bloqué tant que l'adresse est fausse.
+- Chaque domaine affiche 30 fournisseurs, puis « Afficher la suite » ; la recherche et le filtre montrent toujours tous les résultats.
+- Si la base est injoignable, un bouton « Réessayer » évite de recharger la page.
+- Un lien « Aller à la recherche » apparaît au premier appui sur Tab.
+- À côté de « Connexion requise », un bouton « Me connecter ».
+- Boutons plus grands sur téléphone (44 px), bandeau resserré.
+
 ## 2.5 — 1er novembre 2026
 
 - Nouveauté : le mode clair ou sombre que tu choisis dans une appli est repris dans toutes les autres.

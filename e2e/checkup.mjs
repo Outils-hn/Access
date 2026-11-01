@@ -88,8 +88,8 @@ async function brancher(ctx) {
 }
 
 const b = await chromium.launch();
-async function page({ dark = false } = {}) {
-  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, permissions: ["clipboard-read", "clipboard-write"] });
+async function page({ dark = false, largeur = 1440 } = {}) {
+  const ctx = await b.newContext({ viewport: { width: largeur, height: largeur < 600 ? 800 : 900 }, permissions: ["clipboard-read", "clipboard-write"] });
   if (dark) await ctx.addInitScript(() => localStorage.setItem("access-theme", "dark"));
   await brancher(ctx);
   const p = await ctx.newPage();
@@ -153,6 +153,9 @@ try {
   await p.locator("#b-mdp").fill("Bureau-42!");
   await p.locator("#p-id").fill("alice.perso");
   await p.locator("#p-mdp").fill("Alice-perso-7");
+  await p.getByLabel("Site", { exact: true }).fill("pas un site");
+  ok(await p.getByRole("button", { name: "Ajouter", exact: true }).isDisabled() && await p.getByText("Adresse du site invalide").isVisible(), "site invalide : message et enregistrement bloqué");
+  await p.getByLabel("Site", { exact: true }).fill("sika.ch");
   await p.locator("#f-email").fill("info@sika");
   ok(await p.getByRole("button", { name: "Ajouter", exact: true }).isDisabled() && await p.getByText("Email invalide").isVisible(), "email invalide refusé");
   await p.locator("#f-email").fill("info@sika.ch");
@@ -213,6 +216,20 @@ try {
   await p.keyboard.press("Escape");
   const copie = await p.evaluate(() => localStorage.getItem("access-copie-locale") || "");
   ok(copie.includes("Sika") && !/Bureau-42|Alice-perso/.test(copie), "copie locale hors ligne sans les mots de passe");
+
+  // 7b. Telephone : cartes, pas de debordement, cibles tactiles, accessibilite
+  const pm = await page({ largeur: 390 });
+  await pm.goto(URL0); await pm.waitForLoadState("networkidle");
+  await seConnecter(pm, "alice@exemple.ch");
+  await shot(pm, "07-mobile");
+  const mesure = await pm.evaluate(() => ({
+    debord: document.documentElement.scrollWidth - window.innerWidth,
+    petits: [...document.querySelectorAll("main button, main a")].filter((x) => x.offsetParent && x.getBoundingClientRect().height > 0 && x.getBoundingClientRect().height < 36 && !x.closest("[role=group]")).map((x) => (x.getAttribute("aria-label") || x.textContent || "").trim().slice(0, 30)),
+  }));
+  ok(mesure.debord <= 0, `mobile : aucun débordement horizontal (${mesure.debord} px)`);
+  ok(mesure.petits.length === 0, `mobile : cibles tactiles assez grandes (trop petites : ${mesure.petits.join(", ")})`);
+  const axeM = await new AxeBuilder({ page: pm }).withTags(["wcag2a", "wcag2aa"]).analyze();
+  ok(axeM.violations.length === 0, `accessibilité (mobile) : ${axeM.violations.length} problème(s)${axeM.violations.map((v) => ` [${v.id}: ${v.nodes.length} ${v.nodes[0]?.target}]`).join("")}`);
 
   // 8. Accessibilite, theme sombre, selecteur
   await p.waitForTimeout(800); // fin de l'animation de fermeture des fenetres

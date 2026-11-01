@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAcces, useActions, useAnnuaire, type Fournisseur } from "@/lib/donnees";
-import { emailOk, normaliserUrl, telephoneOk } from "@/lib/recherche";
+import { emailOk, normaliserUrl, telephoneOk, urlOk } from "@/lib/recherche";
 
 type Props = { open: boolean; onOpenChange: (o: boolean) => void; initial: Fournisseur | null; domaineParDefaut?: string };
 type Champs = { identifiant: string; mdp: string };
@@ -67,6 +67,8 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
     setPerso({ identifiant: p?.identifiant ?? "", mdp: p?.mot_de_passe ?? "" });
   }, [open, initial, domaineParDefaut]);
 
+  const siteFaux = !urlOk(site) ? "Adresse du site invalide : exemple schueco.com." : "";
+  const caoFaux = !urlOk(cao) ? "Adresse du site CAO invalide : exemple schueco.com." : "";
   const contactFaux = !emailOk(email) || !emailOk(emailTech) ? "Email invalide : nom@domaine.ch."
     : !telephoneOk(telephone) ? "Téléphone : chiffres, espaces et + seulement." : "";
 
@@ -89,7 +91,7 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
           <DialogTitle>{initial ? `Modifier ${initial.nom}` : "Nouveau fournisseur"}</DialogTitle>
           <DialogDescription className="sr-only">Nom, domaine, liens et accès du fournisseur</DialogDescription>
         </DialogHeader>
-        <form id="form-fournisseur" className="space-y-4" onSubmit={(e) => { e.preventDefault(); if (nom.trim() && domaine && !contactFaux) enregistrer(); }}>
+        <form id="form-fournisseur" className="space-y-4" onSubmit={(e) => { e.preventDefault(); if (nom.trim() && domaine && !contactFaux && !siteFaux && !caoFaux) enregistrer(); }}>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="f-nom">Nom *</Label>
@@ -104,11 +106,13 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="f-site">Site</Label>
-              <Input id="f-site" placeholder="schueco.com" value={site} onChange={(e) => setSite(e.target.value)} />
+              <Input id="f-site" placeholder="schueco.com" value={site} aria-invalid={!!siteFaux || undefined} aria-describedby={siteFaux ? "f-site-err" : undefined} onChange={(e) => setSite(e.target.value)} />
+              {siteFaux && <p id="f-site-err" role="alert" className="text-xs text-destructive">{siteFaux}</p>}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="f-cao">Site CAO</Label>
-              <Input id="f-cao" placeholder="facultatif" value={cao} onChange={(e) => setCao(e.target.value)} />
+              <Input id="f-cao" placeholder="facultatif" value={cao} aria-invalid={!!caoFaux || undefined} aria-describedby={caoFaux ? "f-cao-err" : undefined} onChange={(e) => setCao(e.target.value)} />
+              {caoFaux && <p id="f-cao-err" role="alert" className="text-xs text-destructive">{caoFaux}</p>}
             </div>
           </div>
           <fieldset className="space-y-2 rounded-lg border border-border p-3">
@@ -139,7 +143,7 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
         </form>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Annuler</Button>
-          <Button type="submit" form="form-fournisseur" disabled={busy || !nom.trim() || !domaine || !!contactFaux}>{initial ? "Enregistrer" : "Ajouter"}</Button>
+          <Button type="submit" form="form-fournisseur" disabled={busy || !nom.trim() || !domaine || !!contactFaux || !!siteFaux || !!caoFaux}>{initial ? "Enregistrer" : "Ajouter"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

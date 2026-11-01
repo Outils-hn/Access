@@ -394,5 +394,23 @@ body { border-top: 3px solid var(--app); }
 .bandeau-icone svg { width: 16px; height: 16px; }
 .bandeau-statut { display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border: 1px solid var(--border); border-radius: 999px; font-size: 12px; color: var(--muted-foreground); white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
 .bandeau-statut.ouvert { border-color: var(--app); color: var(--app-ink); }
+@media (max-width: 640px) {
+  .bandeau-in { padding: 0 12px; gap: 8px; }
+  .bandeau-statut { display: none; }
+  .bandeau-btn { height: 40px; }
+  .bandeau-icone { width: 40px; height: 40px; }
+}
+/* Telephone : chaque fournisseur devient une carte (le tableau a 6 colonnes deborderait) */
+@media (max-width: 640px) {
+  .tbl-cartes, .tbl-cartes tbody, .tbl-cartes tr, .tbl-cartes td { display: block; width: 100%; }
+  .tbl-cartes colgroup { display: none; }
+  .tbl-cartes thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .tbl-cartes tr { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+  .tbl-cartes td { border: 0; padding: 0.25rem 0; white-space: normal; }
+  .tbl-cartes td:first-child { padding-left: 0; font-size: 1rem; }
+  .tbl-cartes td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted-foreground); margin-bottom: 0.1rem; }
+  .tbl-cartes td.truncate { overflow: visible; text-overflow: clip; }
+  .tbl-cartes a { min-height: 40px; align-items: center; }
+}
 .bandeau-marque > svg:first-child { width: 22px; height: 22px; }
 .page { width: 100%; max-width: 1440px; margin-left: auto; margin-right: auto; padding-left: 32px; padding-right: 32px; }
