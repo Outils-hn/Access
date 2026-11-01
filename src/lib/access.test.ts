@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compterFiches, correspond, emailOk, hote, lienDemande, lienTel, normaliserUrl, sansAccents, telephoneOk } from "./recherche";
+import { compterFiches, correspond, emailOk, hote, lienDemande, lienTel, normaliserUrl, sansAccents, telephoneOk, urlOk } from "./recherche";
 import { exporter, planifier } from "./sauvegarde";
 import { grouper, type Annuaire } from "./donnees";
 
@@ -19,6 +19,14 @@ describe("recherche", () => {
     expect(normaliserUrl("schueco.com")).toBe("https://schueco.com");
     expect(normaliserUrl(" http://a.ch ")).toBe("http://a.ch");
     expect(normaliserUrl("")).toBe("");
+  });
+  it("refuse une adresse qui n'est pas un site", () => {
+    expect(urlOk("")).toBe(true);
+    expect(urlOk("schueco.com")).toBe(true);
+    expect(urlOk("https://www.schueco.com/ch/fr")).toBe(true);
+    expect(urlOk("pas un site")).toBe(false);
+    expect(urlOk("pasunsite")).toBe(false);
+    expect(urlOk("ftp://a.ch")).toBe(false);
   });
 });
 

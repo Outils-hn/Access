@@ -25,6 +25,14 @@ export function normaliserUrl(s: string): string {
   return /^https?:\/\//i.test(t) ? t : `https://${t}`;
 }
 
+/** Adresse web plausible : un nom de domaine avec un point, sans espace (« pas un site » est refuse). Vide accepte. */
+export function urlOk(s: string): boolean {
+  const t = s.trim();
+  if (!t) return true;
+  if (/\s/.test(t)) return false;
+  try { const u = new URL(normaliserUrl(t)); return /^https?:$/.test(u.protocol) && /^[^.]+(\.[^.]+)+$/.test(u.hostname); } catch { return false; }
+}
+
 /** Nombre de fiches Index d'un fournisseur : tous les mots de son nom dans le champ « fournisseur » de la fiche. */
 export function compterFiches(nom: string, fournisseursDesFiches: string[]): number {
   const mots = sansAccents(nom).split(/[\s\-–&.,()]+/).filter((m) => m.length > 1);

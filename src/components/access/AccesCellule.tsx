@@ -8,7 +8,7 @@ async function copier(texte: string, quoi: string) {
   catch { toast.error("Copie impossible dans ce navigateur."); }
 }
 
-const btn = "inline-flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground";
+const btn = "inline-flex size-10 shrink-0 sm:size-6 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground";
 
 /** Un acces (bureau ou perso) : identifiant + mot de passe masque, boutons copier. */
 function Ligne({ a, etiquette, nom }: { a: Acces; etiquette: string; nom: string }) {
@@ -38,7 +38,14 @@ function Ligne({ a, etiquette, nom }: { a: Acces; etiquette: string; nom: string
 }
 
 export function AccesCellule({ bureau, perso, nom, connecte }: { bureau: Acces | null; perso: Acces | null; nom: string; connecte: boolean }) {
-  if (!connecte) return <span className="text-xs text-muted-foreground">Connexion requise</span>;
+  if (!connecte) {
+    return (
+      <span className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+        Connexion requise
+        <button type="button" className="min-h-10 underline underline-offset-2 hover:text-foreground sm:min-h-0" onClick={() => window.dispatchEvent(new Event("access:connexion"))}>Me connecter</button>
+      </span>
+    );
+  }
   if (!bureau && !perso) return <span className="text-muted-foreground">—</span>;
   return (
     <div className="space-y-1.5">

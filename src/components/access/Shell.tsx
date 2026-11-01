@@ -37,8 +37,15 @@ export function Shell({ children }: { children: ReactNode }) {
   const { horsLigne } = useAnnuaire();
   const [connexion, setConnexion] = useState(false);
   const [dark, setDark] = useTheme();
+  useEffect(() => {
+    const ouvrir = () => setConnexion(true);
+    window.addEventListener("access:connexion", ouvrir);
+    return () => window.removeEventListener("access:connexion", ouvrir);
+  }, []);
   return (
     <div className="flex min-h-screen flex-col">
+      <a href="#recherche" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:shadow-md"
+        onClick={(e) => { e.preventDefault(); document.getElementById("recherche")?.focus(); }}>Aller à la recherche</a>
       <Bandeau
         marque={<>
           <AccessMark />
