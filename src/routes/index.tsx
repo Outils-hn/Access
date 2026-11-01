@@ -114,7 +114,7 @@ function Annuaire() {
             <section key={g.domaine.id} className="panel overflow-hidden" aria-labelledby={`d-${g.domaine.id}`}>
               <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
                 <h2 id={`d-${g.domaine.id}`} className="card-title">{g.domaine.nom} <span className="text-muted-foreground">· {g.fournisseurs.length}</span></h2>
-                {valide && <button className="text-xs text-muted-foreground hover:text-foreground" onClick={() => setEdition({ f: null, domaine: g.domaine.id })}>+ Ajouter ici</button>}
+                {valide && <button className="min-h-10 px-2 text-xs text-muted-foreground hover:text-foreground sm:min-h-0 sm:px-0" onClick={() => setEdition({ f: null, domaine: g.domaine.id })}>+ Ajouter ici</button>}
               </div>
               {g.fournisseurs.length === 0 ? (
                 <p className="px-4 py-4 text-sm text-muted-foreground">Aucun fournisseur dans ce domaine.</p>
