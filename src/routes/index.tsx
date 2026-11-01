@@ -143,7 +143,7 @@ function Annuaire() {
                         </td>
                         <td data-label="Contact"><Contact f={f} /></td>
                         <td data-label="Accès"><AccesCellule bureau={acces.bureau(f.id)} perso={acces.perso(f.id)} nom={f.nom} connecte={valide} /></td>
-                        <td data-label="Notes" className="truncate text-muted-foreground" title={f.notes}>{f.notes}</td>
+                        <td data-label="Notes" className="text-muted-foreground"><NoteCellule texte={f.notes} /></td>
                         <td>
                           {valide && <div className="flex justify-end opacity-60 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                             <Button size="icon" variant="ghost" className="size-11 sm:size-8" onClick={() => setEdition({ f })} aria-label={`Modifier ${f.nom}`}><Pencil className="size-4" /></Button>
@@ -215,5 +215,18 @@ function Contact({ f }: { f: Fournisseur }) {
       {f.telephone && <a href={lienTel(f.telephone)} className={lien} title={`Appeler ${f.nom}`}><Phone className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate tabular-nums">{f.telephone}</span></a>}
       {f.email_technique && <a href={lienDemande(f.email_technique, f.nom)} className={lien} title={`Service technique : ${f.email_technique}`}><Wrench className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.email_technique}</span></a>}
     </div>
+  );
+}
+
+/** Note d'un fournisseur : une ligne dans le tableau ; un clic la deroule en entier (et la referme). */
+function NoteCellule({ texte }: { texte: string }) {
+  const [ouverte, setOuverte] = useState(false);
+  if (!texte) return null;
+  return (
+    <button type="button" aria-expanded={ouverte} onClick={() => setOuverte((o) => !o)}
+      title={ouverte ? "Réduire la note" : "Lire toute la note"}
+      className={"note-btn block w-full cursor-pointer text-left underline-offset-2 hover:text-foreground " + (ouverte ? "whitespace-pre-wrap break-words" : "truncate")}>
+      {texte}
+    </button>
   );
 }
