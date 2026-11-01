@@ -4,6 +4,10 @@ Le numéro de version se met à jour dans `src/lib/version.ts` (pied de page et 
 
 Chaque version qui change quelque chose de visible pour l'équipe a une puce « Nouveauté : … », en langage courant : c'est la seule phrase affichée sur la page « Nouveautés » de l'Accueil.
 
+## 2.7 — 1er novembre 2026
+
+- Nouveauté : dans l'annuaire, un clic sur une note la déroule en entier (et un second clic la referme), au lieu de la laisser coupée.
+
 ## 2.6 — 1er novembre 2026
 
 - Nouveauté : sur téléphone, l'annuaire s'affiche en cartes et une adresse de site invalide est signalée avant l'enregistrement.

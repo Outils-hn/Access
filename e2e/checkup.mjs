@@ -29,7 +29,7 @@ function seed() {
   const d1 = uid(), d2 = uid(), d3 = uid();
   etat.access_domaines = [{ id: d1, nom: "Menuiserie alu", ordre: 1 }, { id: d2, nom: "Acier", ordre: 2 }, { id: d3, nom: "Isolation", ordre: 3 }];
   etat.access_fournisseurs = [
-    { id: uid(), nom: "Schüco", domaine_id: d1, site: "https://www.schueco.com/ch/fr", site_cao: "https://cad.schueco.com", notes: "Délais 6 semaines" },
+    { id: uid(), nom: "Schüco", domaine_id: d1, site: "https://www.schueco.com/ch/fr", site_cao: "https://cad.schueco.com", notes: "Délais 6 semaines, livraison franco dès 2'000 CHF, demander M. Dupont avant toute commande de profilés thermolaqués spéciaux" },
     { id: uid(), nom: "Jansen", domaine_id: d2, site: "https://www.jansen.com", site_cao: "", notes: "" },
     { id: uid(), nom: "Flumroc", domaine_id: d3, site: "https://www.flumroc.ch", site_cao: "", notes: "Fiches techniques sur le site" },
   ];
@@ -119,6 +119,14 @@ try {
   ok((await p.locator("section h2").allTextContents()).map((t) => t.split(" ·")[0]).join("|") === "Menuiserie alu|Acier|Isolation", "fournisseurs groupés par domaine, dans l'ordre");
   ok(await p.getByText("Connexion requise").first().isVisible(), "visiteur : accès remplacés par « Connexion requise »");
   ok(!(await p.getByRole("button", { name: "Nouveau fournisseur" }).count()), "visiteur : pas de bouton d'ajout");
+  const note = p.locator(".note-btn").first();
+  const h0 = (await note.boundingBox()).height;
+  await note.click();
+  const h1 = (await note.boundingBox()).height;
+  ok((await note.getAttribute("aria-expanded")) === "true" && h1 > h0 * 1.5, `note : un clic la déroule en entier (${Math.round(h0)} → ${Math.round(h1)} px)`);
+  await shot(p, "02b-note-deroulee");
+  await note.click();
+  ok((await note.getAttribute("aria-expanded")) === "false", "note : un second clic la referme");
   await shot(p, "02-visiteur");
   const rech = p.getByLabel("Rechercher");
   await rech.fill("schuco");
