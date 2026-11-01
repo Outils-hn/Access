@@ -239,6 +239,34 @@ try {
   const axeM = await new AxeBuilder({ page: pm }).withTags(["wcag2a", "wcag2aa"]).analyze();
   ok(axeM.violations.length === 0, `accessibilité (mobile) : ${axeM.violations.length} problème(s)${axeM.violations.map((v) => ` [${v.id}: ${v.nodes.length} ${v.nodes[0]?.target}]`).join("")}`);
 
+  // 7c. Telephone : fenetres avec des noms tres longs (fournisseur, domaine, note)
+  const LONG = "Fabrique Suisse de Constructions Metalliques et Verrieres Speciales du Jura Bernois SA Succursale Romande";
+  etat.access_domaines.push({ id: uid(), nom: "Menuiseries extérieures alu acier inox et verrières thermolaquées spéciales", ordre: 9 });
+  etat.access_fournisseurs.push({ id: uid(), nom: LONG, domaine_id: etat.access_domaines[0].id, site: "https://www.un-site-avec-une-adresse-vraiment-tres-longue-pour-tester.ch/chemin/profond/page", site_cao: "", notes: "Note très longue ".repeat(30) });
+  await pm.reload(); await pm.waitForLoadState("networkidle"); await pm.waitForTimeout(1000);
+  const debordFenetre = async (nom) => {
+    await pm.waitForTimeout(500);
+    const r = await pm.evaluate(() => {
+      const d = document.querySelector("[role=dialog]");
+      if (!d) return null;
+      const b = d.getBoundingClientRect();
+      const hors = [...d.querySelectorAll("*")].filter((e) => { const x = e.getBoundingClientRect(); return x.width > 0 && (x.right > b.right + 1 || x.left < b.left - 1) && !e.closest("[data-radix-select-viewport],[role=listbox]"); }).slice(0, 4).map((e) => `${e.tagName}.${String(e.className).slice(0, 40)}`);
+      return { sw: d.scrollWidth - d.clientWidth, hors, page: document.documentElement.scrollWidth - window.innerWidth };
+    });
+    ok(!!r && r.sw <= 0 && r.hors.length === 0 && r.page <= 0, `mobile : fenêtre « ${nom} » sans débordement${r ? ` (${r.sw} px ; ${r.hors.join(", ")})` : " (fenêtre introuvable)"}`);
+    await shot(pm, `07c-${nom.replace(/\W+/g, "-")}`);
+  };
+  await pm.getByRole("button", { name: "Domaines" }).click();
+  await debordFenetre("Domaines nom long");
+  await pm.keyboard.press("Escape"); await pm.waitForTimeout(600);
+  await pm.getByRole("button", { name: `Modifier ${LONG}` }).click();
+  await debordFenetre("Modifier fournisseur long");
+  await pm.keyboard.press("Escape"); await pm.waitForTimeout(600);
+  await pm.getByRole("button", { name: "Nouveau fournisseur" }).click();
+  await pm.getByLabel("Nom *").fill(LONG + " " + LONG);
+  await debordFenetre("Nouveau fournisseur nom long");
+  await pm.keyboard.press("Escape"); await pm.waitForTimeout(600);
+
   // 8. Accessibilite, theme sombre, selecteur
   await p.waitForTimeout(800); // fin de l'animation de fermeture des fenetres
   const axe = await new AxeBuilder({ page: p }).withTags(["wcag2a", "wcag2aa"]).analyze();
