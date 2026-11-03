@@ -416,3 +416,6 @@ body { border-top: 3px solid var(--app); }
 .page { width: 100%; max-width: 1440px; margin-left: auto; margin-right: auto; padding-left: 32px; padding-right: 32px; }
 
 @media (max-width: 640px) { .tbl-cartes .note-btn { white-space: pre-wrap; overflow: visible; text-overflow: clip; min-height: 40px; } }
+
+/* Fournisseur ouvert depuis un lien d'Index : surlignage doux, quelques secondes */
+.ligne-ciblee { background: color-mix(in oklab, var(--app-fill) 10%, transparent); box-shadow: inset 3px 0 0 var(--app-fill); transition: background .4s; }

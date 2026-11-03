@@ -267,6 +267,19 @@ try {
   await debordFenetre("Nouveau fournisseur nom long");
   await pm.keyboard.press("Escape"); await pm.waitForTimeout(600);
 
+  // 7d. Lien depuis Index : ?fournisseur=<id> ouvre l'annuaire sur ce fournisseur
+  const jansen = etat.access_fournisseurs.find((f) => f.nom === "Jansen");
+  const pl = await page({ largeur: 390 });
+  await pl.goto(`${URL0}/?fournisseur=${jansen.id}`); await pl.waitForLoadState("networkidle"); await pl.waitForTimeout(1200);
+  ok((await pl.getByLabel("Rechercher").inputValue()) === "Jansen", "lien ?fournisseur= : recherche remplie avec le nom");
+  ok((await pl.locator("tbody tr").count()) === 1, "lien ?fournisseur= : le fournisseur est seul affiché");
+  const cibl = pl.locator(`#f-${jansen.id}`);
+  ok(await cibl.evaluate((e) => e.classList.contains("ligne-ciblee")), "lien ?fournisseur= : ligne surlignée");
+  ok(await cibl.evaluate((e) => { const r = e.getBoundingClientRect(); return r.top >= 0 && r.bottom <= window.innerHeight; }), "lien ?fournisseur= : ligne visible à l'écran (téléphone)");
+  await shot(pl, "07d-lien-index");
+  await pl.goto(`${URL0}/?fournisseur=Flumroc`); await pl.waitForLoadState("networkidle"); await pl.waitForTimeout(800);
+  ok((await pl.getByLabel("Rechercher").inputValue()) === "Flumroc" && (await pl.locator("tbody tr").count()) === 1, "lien ?fournisseur= avec un nom : trouve Flumroc");
+
   // 8. Accessibilite, theme sombre, selecteur
   await p.waitForTimeout(800); // fin de l'animation de fermeture des fenetres
   const axe = await new AxeBuilder({ page: p }).withTags(["wcag2a", "wcag2aa"]).analyze();
