@@ -16,6 +16,10 @@ import { FournisseurDialog } from "@/components/access/FournisseurDialog";
 import { DomainesDialog } from "@/components/access/DomainesDialog";
 
 export const Route = createFileRoute("/")({
+  // ?fournisseur=<id ou nom> : lien depuis une fiche d'Index, ouvre l'annuaire sur ce fournisseur
+  validateSearch: (s: Record<string, unknown>): { fournisseur?: string } => ({
+    ...(typeof s.fournisseur === "string" && s.fournisseur.trim() ? { fournisseur: s.fournisseur.trim().slice(0, 100) } : {}),
+  }),
   head: () => ({ meta: [{ title: "Access — annuaire des fournisseurs" }] }),
   component: Annuaire,
 });
@@ -35,6 +39,25 @@ function Annuaire() {
   const [gererDomaines, setGererDomaines] = useState(false);
   const recherche = useRef<HTMLInputElement>(null);
   const [limites, setLimites] = useState<Record<string, number>>({});
+  const { fournisseur: cible } = Route.useSearch();
+  const [mis, setMis] = useState<string | null>(null); // fournisseur mis en evidence quelques secondes
+  const cibleFaite = useRef(false);
+
+  // Lien depuis Index : recherche pre-remplie sur le fournisseur, ligne centree et surlignee
+  useEffect(() => {
+    if (!cible || chargement || cibleFaite.current || !fournisseurs.length) return;
+    cibleFaite.current = true;
+    const f = fournisseurs.find((x) => x.id === cible);
+    setQ(f ? f.nom : cible);
+    setFiltre(null);
+    if (f) setMis(f.id);
+  }, [cible, chargement, fournisseurs]);
+  useEffect(() => {
+    if (!mis) return;
+    document.getElementById(`f-${mis}`)?.scrollIntoView({ block: "center", behavior: "smooth" });
+    const t = setTimeout(() => setMis(null), 6000);
+    return () => clearTimeout(t);
+  }, [mis, q]);
 
   // « / » place le curseur dans la recherche, Echap la vide
   useEffect(() => {
@@ -124,7 +147,7 @@ function Annuaire() {
                   <thead><tr><th className="pl-4">Fournisseur</th><th>Liens</th><th>Contact</th><th>Accès</th><th>Notes</th><th><span className="sr-only">Actions</span></th></tr></thead>
                   <tbody>
                     {g.fournisseurs.slice(0, q || filtre ? undefined : limites[g.domaine.id] ?? PAGE).map((f) => (
-                      <tr key={f.id} className="group">
+                      <tr key={f.id} id={`f-${f.id}`} className={"group" + (mis === f.id ? " ligne-ciblee" : "")}>
                         <td className="pl-4 font-medium">{f.nom}</td>
                         <td data-label="Liens">
                           <div className="flex items-center gap-3">
