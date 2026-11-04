@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compterFiches, correspond, emailOk, hote, lienDemande, lienTel, normaliserUrl, sansAccents, telephoneOk, urlOk } from "./recherche";
+import { compterFiches, fournisseursSansFiche, correspond, emailOk, hote, lienDemande, lienTel, normaliserUrl, sansAccents, telephoneOk, urlOk } from "./recherche";
 import { exporter, planifier } from "./sauvegarde";
 import { grouper, type Annuaire } from "./donnees";
 
@@ -66,6 +66,12 @@ describe("sauvegarde", () => {
 });
 
 describe("fiches Index", () => {
+  it("liste les fournisseurs d'Index sans fiche dans l'annuaire", () => {
+    const fiches = ["Schüco International KG", "SCHUCO", "Jansen AG", "", "Flumroc", "flumroc ", "Sika"];
+    const r = fournisseursSansFiche(fiches, [{ nom: "Schüco" }, { nom: "Jansen" }]);
+    expect(r).toEqual([{ nom: "Flumroc", n: 2 }, { nom: "Sika", n: 1 }]);
+    expect(fournisseursSansFiche([], [{ nom: "Sika" }])).toEqual([]);
+  });
   it("compte les fiches d'un fournisseur, sans accents ni majuscules", () => {
     const f = ["Schüco International KG", "SCHUCO", "Jansen AG", "", "Flumroc"];
     expect(compterFiches("Schüco", f)).toBe(2);

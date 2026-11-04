@@ -43,6 +43,21 @@ export function compterFiches(nom: string, fournisseursDesFiches: string[]): num
   }).length;
 }
 
+/** Fournisseurs presents dans les fiches Index mais sans fiche dans l'annuaire (nom tel qu'ecrit dans Index, nombre de fiches). */
+export function fournisseursSansFiche(fichesIndex: string[], annuaire: { nom: string }[]): { nom: string; n: number }[] {
+  const noms = new Map<string, { nom: string; n: number }>();
+  for (const brut of fichesIndex) {
+    const nom = (brut ?? "").trim();
+    if (!nom) continue;
+    const cle = sansAccents(nom);
+    const e = noms.get(cle);
+    if (e) e.n++; else noms.set(cle, { nom, n: 1 });
+  }
+  return [...noms.values()]
+    .filter((e) => !annuaire.some((f) => compterFiches(f.nom, [e.nom]) > 0))
+    .sort((a, b) => sansAccents(a.nom).localeCompare(sansAccents(b.nom)));
+}
+
 /** Email plausible (vide accepte : le champ est facultatif). */
 export const emailOk = (s: string) => !s.trim() || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s.trim());
 /** Telephone : chiffres, espaces, +, (), point, tiret, barre. */

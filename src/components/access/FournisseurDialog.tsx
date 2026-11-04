@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useAcces, useActions, useAnnuaire, type Fournisseur } from "@/lib/donnees";
 import { emailOk, normaliserUrl, telephoneOk, urlOk } from "@/lib/recherche";
 
-type Props = { open: boolean; onOpenChange: (o: boolean) => void; initial: Fournisseur | null; domaineParDefaut?: string };
+type Props = { open: boolean; onOpenChange: (o: boolean) => void; initial: Fournisseur | null; domaineParDefaut?: string; nomParDefaut?: string };
 type Champs = { identifiant: string; mdp: string };
 
 function BlocAcces({ id, titre, aide, v, set }: { id: string; titre: string; aide: string; v: Champs; set: (c: Champs) => void }) {
@@ -37,7 +37,7 @@ function BlocAcces({ id, titre, aide, v, set }: { id: string; titre: string; aid
   );
 }
 
-export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefaut }: Props) {
+export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefaut, nomParDefaut }: Props) {
   const { domaines } = useAnnuaire();
   const acces = useAcces();
   const { enregistrerFournisseur, enregistrerAcces } = useActions();
@@ -59,13 +59,13 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
   useEffect(() => {
     if (!open) return;
     const { premier, acces: a } = courant.current;
-    setNom(initial?.nom ?? ""); setDomaine(initial?.domaine_id ?? domaineParDefaut ?? premier);
+    setNom(initial?.nom ?? nomParDefaut ?? ""); setDomaine(initial?.domaine_id ?? domaineParDefaut ?? premier);
     setSite(initial?.site ?? ""); setCao(initial?.site_cao ?? ""); setNotes(initial?.notes ?? "");
     setEmail(initial?.email ?? ""); setTelephone(initial?.telephone ?? ""); setEmailTech(initial?.email_technique ?? "");
     const b = initial ? a.bureau(initial.id) : null, p = initial ? a.perso(initial.id) : null;
     setBureau({ identifiant: b?.identifiant ?? "", mdp: b?.mot_de_passe ?? "" });
     setPerso({ identifiant: p?.identifiant ?? "", mdp: p?.mot_de_passe ?? "" });
-  }, [open, initial, domaineParDefaut]);
+  }, [open, initial, domaineParDefaut, nomParDefaut]);
 
   const siteFaux = !urlOk(site) ? "Adresse du site invalide : exemple schueco.com." : "";
   const caoFaux = !urlOk(cao) ? "Adresse du site CAO invalide : exemple schueco.com." : "";
