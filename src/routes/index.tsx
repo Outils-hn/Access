@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Box, ExternalLink, FileText, Mail, Phone, Wrench, Pencil, Plus, Search, Settings2, Trash2 } from "lucide-react";
+import { Box, ChevronDown, ExternalLink, FileText, Mail, Phone, Pencil, Plus, Search, Settings2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -244,15 +244,26 @@ function LienFiches({ nom, n }: { nom: string; n: number }) {
   );
 }
 
-/** Contact general du fournisseur : email (objet « Demande d'information » pre-rempli), telephone, service technique. */
+/** Contact general du fournisseur : email (objet « Demande d'information » pre-rempli), telephone, et une personne de contact depliable. */
 function Contact({ f }: { f: Fournisseur }) {
-  if (!f.email && !f.telephone && !f.email_technique) return <span className="text-muted-foreground">—</span>;
+  const personne = [f.contact_prenom, f.contact_nom].filter(Boolean).join(" ");
+  if (!f.email && !f.telephone && !personne && !f.contact_telephone) return <span className="text-muted-foreground">—</span>;
   const lien = "inline-flex min-w-0 max-w-full items-center gap-1.5 underline-offset-2 hover:underline";
   return (
     <div className="flex min-w-0 flex-col gap-0.5 text-[13px]">
       {f.email && <a href={lienDemande(f.email, f.nom)} className={lien} title={`Écrire à ${f.email}`}><Mail className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.email}</span></a>}
       {f.telephone && <a href={lienTel(f.telephone)} className={lien} title={`Appeler ${f.nom}`}><Phone className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate tabular-nums">{f.telephone}</span></a>}
-      {f.email_technique && <a href={lienDemande(f.email_technique, f.nom)} className={lien} title={`Service technique : ${f.email_technique}`}><Wrench className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.email_technique}</span></a>}
+      {(personne || f.contact_telephone) && (
+        <details className="group">
+          <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-muted-foreground hover:text-foreground">
+            Personne de contact <ChevronDown className="size-3.5 transition-transform group-open:rotate-180" />
+          </summary>
+          <div className="mt-0.5 flex flex-col gap-0.5 pl-0.5">
+            {personne && <span className="truncate">{personne}</span>}
+            {f.contact_telephone && <a href={lienTel(f.contact_telephone)} className={lien} title={`Appeler ${personne || f.nom}`}><Phone className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate tabular-nums">{f.contact_telephone}</span></a>}
+          </div>
+        </details>
+      )}
     </div>
   );
 }

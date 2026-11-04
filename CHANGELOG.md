@@ -4,6 +4,12 @@ Le numéro de version se met à jour dans `src/lib/version.ts` (pied de page et 
 
 Chaque version qui change quelque chose de visible pour l'équipe a une puce « Nouveauté : … », en langage courant : c'est la seule phrase affichée sur la page « Nouveautés » de l'Accueil.
 
+## 2.11 — 5 novembre 2026
+
+- Nouveauté : dans la fiche d'un fournisseur, « Email du service technique » est remplacé par « Personne de contact » : une petite flèche déroule nom, prénom et téléphone. L'email général (info@fournisseur) reste.
+- Nouveauté : sans compte validé, on ne peut plus télécharger la sauvegarde JSON (l'import était déjà réservé aux comptes).
+- Un script SQL est à lancer une fois dans Supabase (`supabase/migrations/20261105090000_access_contact.sql`). Les anciens emails techniques restent en base mais ne sont plus affichés.
+
 ## 2.10 — 4 novembre 2026
 
 - Nouveauté : un encart « Fournisseurs d'Index sans fiche ici » liste les fournisseurs cités dans les fiches d'Index qui n'ont pas encore de fiche dans l'annuaire, avec un bouton « Créer la fiche » qui pré-remplit le nom. Visible pour les comptes validés.

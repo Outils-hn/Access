@@ -65,7 +65,7 @@ export function SauvegardeDialog({ open, onOpenChange }: { open: boolean; onOpen
         </DialogHeader>
         {!plan ? (
           <div className="flex gap-2">
-            <Button variant="outline" className="flex-1 gap-1.5" onClick={telecharger} disabled={!annuaire.fournisseurs.length && !annuaire.domaines.length}>
+            <Button variant="outline" className="flex-1 gap-1.5" onClick={telecharger} disabled={!valide || (!annuaire.fournisseurs.length && !annuaire.domaines.length)} title={valide ? undefined : "Réservé aux comptes validés"}>
               <Download className="size-4" /> Télécharger
             </Button>
             <Button variant="outline" className="flex-1 gap-1.5" disabled={!valide} title={valide ? undefined : "Réservé aux comptes validés"} onClick={() => input.current?.click()}>
