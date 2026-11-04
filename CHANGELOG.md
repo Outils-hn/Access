@@ -4,6 +4,10 @@ Le numéro de version se met à jour dans `src/lib/version.ts` (pied de page et 
 
 Chaque version qui change quelque chose de visible pour l'équipe a une puce « Nouveauté : … », en langage courant : c'est la seule phrase affichée sur la page « Nouveautés » de l'Accueil.
 
+## 2.9 — 4 novembre 2026
+
+- Nouveauté : la connexion d'Access est maintenant la même que celle d'Index, Masse, Format, Strate et Check : se connecter dans l'une suffit pour toutes. Une seule reconnexion est nécessaire dans Access après cette mise à jour.
+
 ## 2.8 — 3 novembre 2026
 
 - Nouveauté : un lien depuis une fiche d'Index ouvre l'annuaire directement sur le bon fournisseur : la recherche est remplie à sa place et sa ligne est surlignée quelques secondes.
