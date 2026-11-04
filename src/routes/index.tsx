@@ -10,7 +10,7 @@ import {
 import { grouper, useAcces, useActions, useAnnuaire, useFichesIndex, type Fournisseur } from "@/lib/donnees";
 import { INDEX_URL } from "@/lib/base";
 import { useCompte } from "@/lib/compte";
-import { compterFiches, correspond, hote, lienDemande, lienTel } from "@/lib/recherche";
+import { compterFiches, correspond, fournisseursSansFiche, hote, lienDemande, lienTel } from "@/lib/recherche";
 import { AccesCellule } from "@/components/access/AccesCellule";
 import { FournisseurDialog } from "@/components/access/FournisseurDialog";
 import { DomainesDialog } from "@/components/access/DomainesDialog";
@@ -34,10 +34,11 @@ function Annuaire() {
   const fichesIndex = useFichesIndex();
   const [q, setQ] = useState("");
   const [filtre, setFiltre] = useState<string | null>(null);
-  const [edition, setEdition] = useState<{ f: Fournisseur | null; domaine?: string } | null>(null);
+  const [edition, setEdition] = useState<{ f: Fournisseur | null; domaine?: string; nom?: string } | null>(null);
   const [aSupprimer, setASupprimer] = useState<Fournisseur | null>(null);
   const [gererDomaines, setGererDomaines] = useState(false);
   const recherche = useRef<HTMLInputElement>(null);
+  const sansFiche = useMemo(() => fournisseursSansFiche(fichesIndex, fournisseurs), [fichesIndex, fournisseurs]);
   const [limites, setLimites] = useState<Record<string, number>>({});
   const { fournisseur: cible } = Route.useSearch();
   const [mis, setMis] = useState<string | null>(null); // fournisseur mis en evidence quelques secondes
@@ -112,6 +113,21 @@ function Annuaire() {
           </Button>
         </div>}
       </div>
+
+      {valide && domaines.length > 0 && sansFiche.length > 0 && (
+        <details className="panel mb-5 p-3">
+          <summary className="cursor-pointer text-sm font-medium">Fournisseurs d'Index sans fiche ici ({sansFiche.length})</summary>
+          <ul className="mt-2 divide-y divide-border" aria-label="Fournisseurs d'Index sans fiche Access">
+            {sansFiche.map((e) => (
+              <li key={e.nom} className="flex items-center gap-3 py-1.5 text-sm">
+                <span className="min-w-0 flex-1 truncate">{e.nom}</span>
+                <span className="text-xs text-muted-foreground">{e.n} fiche{e.n > 1 ? "s" : ""}</span>
+                <Button size="sm" variant="outline" className="min-h-9" onClick={() => setEdition({ f: null, domaine: filtre ?? undefined, nom: e.nom })}>Créer la fiche</Button>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
 
       {domaines.length > 0 && (
         <div className="mb-6 flex flex-wrap gap-1.5" role="group" aria-label="Filtrer par domaine">
@@ -190,7 +206,7 @@ function Annuaire() {
         </div>
       )}
 
-      <FournisseurDialog open={!!edition} onOpenChange={(o) => !o && setEdition(null)} initial={edition?.f ?? null} domaineParDefaut={edition?.domaine} />
+      <FournisseurDialog open={!!edition} onOpenChange={(o) => !o && setEdition(null)} initial={edition?.f ?? null} domaineParDefaut={edition?.domaine} nomParDefaut={edition?.nom} />
       <DomainesDialog open={gererDomaines} onOpenChange={setGererDomaines} />
       <AlertDialog open={!!aSupprimer} onOpenChange={(o) => !o && setASupprimer(null)}>
         <AlertDialogContent>
