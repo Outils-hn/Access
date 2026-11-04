@@ -33,8 +33,8 @@ describe("recherche", () => {
 const base: Annuaire = {
   domaines: [{ id: "d2", nom: "Acier", ordre: 2 }, { id: "d1", nom: "Menuiserie alu", ordre: 1 }],
   fournisseurs: [
-    { id: "f1", nom: "Schüco", domaine_id: "d1", site: "", site_cao: "", notes: "", email: "", telephone: "", email_technique: "" },
-    { id: "f2", nom: "Jansen", domaine_id: "d2", site: "", site_cao: "", notes: "", email: "", telephone: "", email_technique: "" },
+    { id: "f1", nom: "Schüco", domaine_id: "d1", site: "", site_cao: "", notes: "", email: "", telephone: "", email_technique: "", contact_nom: "", contact_prenom: "", contact_telephone: "" },
+    { id: "f2", nom: "Jansen", domaine_id: "d2", site: "", site_cao: "", notes: "", email: "", telephone: "", email_technique: "", contact_nom: "", contact_prenom: "", contact_telephone: "" },
   ],
 };
 

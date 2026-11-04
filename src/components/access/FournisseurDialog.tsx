@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { ChevronDown, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,7 +48,10 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
   const [notes, setNotes] = useState("");
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
-  const [emailTech, setEmailTech] = useState("");
+  const [cNom, setCNom] = useState("");
+  const [cPrenom, setCPrenom] = useState("");
+  const [cTel, setCTel] = useState("");
+  const [cOuvert, setCOuvert] = useState(false);
   const [bureau, setBureau] = useState<Champs>({ identifiant: "", mdp: "" });
   const [perso, setPerso] = useState<Champs>({ identifiant: "", mdp: "" });
   const [busy, setBusy] = useState(false);
@@ -61,7 +64,8 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
     const { premier, acces: a } = courant.current;
     setNom(initial?.nom ?? nomParDefaut ?? ""); setDomaine(initial?.domaine_id ?? domaineParDefaut ?? premier);
     setSite(initial?.site ?? ""); setCao(initial?.site_cao ?? ""); setNotes(initial?.notes ?? "");
-    setEmail(initial?.email ?? ""); setTelephone(initial?.telephone ?? ""); setEmailTech(initial?.email_technique ?? "");
+    setEmail(initial?.email ?? ""); setTelephone(initial?.telephone ?? ""); setCNom(initial?.contact_nom ?? ""); setCPrenom(initial?.contact_prenom ?? ""); setCTel(initial?.contact_telephone ?? "");
+    setCOuvert(!!(initial?.contact_nom || initial?.contact_prenom || initial?.contact_telephone));
     const b = initial ? a.bureau(initial.id) : null, p = initial ? a.perso(initial.id) : null;
     setBureau({ identifiant: b?.identifiant ?? "", mdp: b?.mot_de_passe ?? "" });
     setPerso({ identifiant: p?.identifiant ?? "", mdp: p?.mot_de_passe ?? "" });
@@ -69,14 +73,15 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
 
   const siteFaux = !urlOk(site) ? "Adresse du site invalide : exemple schueco.com." : "";
   const caoFaux = !urlOk(cao) ? "Adresse du site CAO invalide : exemple schueco.com." : "";
-  const contactFaux = !emailOk(email) || !emailOk(emailTech) ? "Email invalide : nom@domaine.ch."
-    : !telephoneOk(telephone) ? "Téléphone : chiffres, espaces et + seulement." : "";
+  const contactFaux = !emailOk(email) ? "Email invalide : nom@domaine.ch."
+    : !telephoneOk(telephone) || !telephoneOk(cTel) ? "Téléphone : chiffres, espaces et + seulement." : "";
 
   const enregistrer = async () => {
     setBusy(true);
     try {
       const id = await enregistrerFournisseur({ id: initial?.id, nom: nom.trim(), domaine_id: domaine, site: normaliserUrl(site), site_cao: normaliserUrl(cao), notes: notes.trim(),
-        email: email.trim(), telephone: telephone.trim(), email_technique: emailTech.trim() });
+        email: email.trim(), telephone: telephone.trim(), email_technique: initial?.email_technique ?? "",
+        contact_nom: cNom.trim(), contact_prenom: cPrenom.trim(), contact_telephone: cTel.trim() });
       if (!id) return;
       const okB = await enregistrerAcces(id, false, bureau.identifiant, bureau.mdp, initial ? acces.bureau(initial.id) : null);
       const okP = await enregistrerAcces(id, true, perso.identifiant, perso.mdp, initial ? acces.perso(initial.id) : null);
@@ -126,13 +131,29 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
                 <Label htmlFor="f-tel">Téléphone</Label>
                 <Input id="f-tel" type="tel" placeholder="+41 21 000 00 00" value={telephone} aria-invalid={!telephoneOk(telephone) || undefined} onChange={(e) => setTelephone(e.target.value)} />
               </div>
-              <div className="col-span-2 space-y-1.5">
-                <Label htmlFor="f-tech">Email du service technique <span className="font-normal text-muted-foreground">(facultatif)</span></Label>
-                <Input id="f-tech" type="email" placeholder="technique@fournisseur.ch" value={emailTech} aria-invalid={!emailOk(emailTech) || undefined} onChange={(e) => setEmailTech(e.target.value)} />
-              </div>
             </div>
+            <details className="group rounded-md border border-border/70 px-3 py-2" open={cOuvert} onToggle={(e) => setCOuvert(e.currentTarget.open)}>
+              <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium">
+                Personne de contact <span className="font-normal text-muted-foreground">(facultatif)</span>
+                <ChevronDown className="size-4 text-muted-foreground transition-transform group-open:rotate-180" />
+              </summary>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="f-cnom">Nom</Label>
+                  <Input id="f-cnom" value={cNom} onChange={(e) => setCNom(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="f-cprenom">Prénom</Label>
+                  <Input id="f-cprenom" value={cPrenom} onChange={(e) => setCPrenom(e.target.value)} />
+                </div>
+                <div className="col-span-2 space-y-1.5">
+                  <Label htmlFor="f-ctel">Téléphone</Label>
+                  <Input id="f-ctel" type="tel" value={cTel} aria-invalid={!telephoneOk(cTel) || undefined} onChange={(e) => setCTel(e.target.value)} />
+                </div>
+              </div>
+            </details>
             {contactFaux ? <p role="alert" className="text-xs text-destructive">{contactFaux}</p>
-              : <p className="text-xs text-muted-foreground">Coordonnées publiques du fournisseur, visibles par tous (pas de contact nominatif).</p>}
+              : <p className="text-xs text-muted-foreground">Coordonnées publiques du fournisseur, visibles par tous .</p>}
           </fieldset>
           <BlocAcces id="b" titre="Accès du bureau" aide="Visible par tous les comptes validés." v={bureau} set={setBureau} />
           <BlocAcces id="p" titre="Mon accès perso" aide="Visible par vous seul. Laisser vide si vous utilisez celui du bureau." v={perso} set={setPerso} />
