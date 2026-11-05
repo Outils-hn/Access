@@ -247,19 +247,20 @@ function LienFiches({ nom, n }: { nom: string; n: number }) {
 /** Contact general du fournisseur : email (objet « Demande d'information » pre-rempli), telephone, et une personne de contact depliable. */
 function Contact({ f }: { f: Fournisseur }) {
   const personne = [f.contact_prenom, f.contact_nom].filter(Boolean).join(" ");
-  if (!f.email && !f.telephone && !personne && !f.contact_telephone) return <span className="text-muted-foreground">—</span>;
+  if (!f.email && !f.telephone && !personne && !f.contact_telephone && !f.contact_email) return <span className="text-muted-foreground">—</span>;
   const lien = "inline-flex min-w-0 max-w-full items-center gap-1.5 underline-offset-2 hover:underline";
   return (
     <div className="flex min-w-0 flex-col gap-0.5 text-[13px]">
       {f.email && <a href={lienDemande(f.email, f.nom)} className={lien} title={`Écrire à ${f.email}`}><Mail className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.email}</span></a>}
       {f.telephone && <a href={lienTel(f.telephone)} className={lien} title={`Appeler ${f.nom}`}><Phone className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate tabular-nums">{f.telephone}</span></a>}
-      {(personne || f.contact_telephone) && (
+      {(personne || f.contact_telephone || f.contact_email) && (
         <details className="group">
           <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-muted-foreground hover:text-foreground">
             Personne de contact <ChevronDown className="size-3.5 transition-transform group-open:rotate-180" />
           </summary>
           <div className="mt-0.5 flex flex-col gap-0.5 pl-0.5">
             {personne && <span className="truncate">{personne}</span>}
+            {f.contact_email && <a href={lienDemande(f.contact_email, f.nom)} className={lien} title={`Écrire à ${f.contact_email}`}><Mail className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.contact_email}</span></a>}
             {f.contact_telephone && <a href={lienTel(f.contact_telephone)} className={lien} title={`Appeler ${personne || f.nom}`}><Phone className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate tabular-nums">{f.contact_telephone}</span></a>}
           </div>
         </details>

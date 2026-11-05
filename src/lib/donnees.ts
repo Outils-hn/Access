@@ -9,7 +9,7 @@ export type Fournisseur = {
   /** Contact general (coordonnees publiques du fournisseur) */
   email: string; telephone: string; email_technique: string;
   /** Personne de contact (facultatif) */
-  contact_nom: string; contact_prenom: string; contact_telephone: string; updated_at?: string;
+  contact_nom: string; contact_prenom: string; contact_telephone: string; contact_email: string; updated_at?: string;
 };
 export type Acces = { id: string; fournisseur_id: string; proprietaire: string | null; identifiant: string; mot_de_passe: string };
 export type Annuaire = { domaines: Domaine[]; fournisseurs: Fournisseur[]; horsLigne?: string };
@@ -21,7 +21,7 @@ async function charger(): Promise<Annuaire> {
   try {
     const [d, f] = await Promise.all([
       db.from("access_domaines").select("id,nom,ordre").order("ordre").order("nom"),
-      db.from("access_fournisseurs").select("id,nom,domaine_id,site,site_cao,notes,email,telephone,email_technique,contact_nom,contact_prenom,contact_telephone,updated_at").order("nom"),
+      db.from("access_fournisseurs").select("id,nom,domaine_id,site,site_cao,notes,email,telephone,email_technique,contact_nom,contact_prenom,contact_telephone,contact_email,updated_at").order("nom"),
     ]);
     const err = d.error || f.error;
     if (err) throw err;

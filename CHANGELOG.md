@@ -4,6 +4,11 @@ Le numéro de version se met à jour dans `src/lib/version.ts` (pied de page et 
 
 Chaque version qui change quelque chose de visible pour l'équipe a une puce « Nouveauté : … », en langage courant : c'est la seule phrase affichée sur la page « Nouveautés » de l'Accueil.
 
+## 2.12 — 5 novembre 2026
+
+- Nouveauté : la « Personne de contact » d'un fournisseur a maintenant aussi un email (cliquable pour écrire, avec l'objet « Demande d'information » pré-rempli).
+- Un script SQL est à lancer une fois dans Supabase (`supabase/migrations/20261105100000_access_contact_email.sql`).
+
 ## 2.11 — 5 novembre 2026
 
 - Nouveauté : dans la fiche d'un fournisseur, « Email du service technique » est remplacé par « Personne de contact » : une petite flèche déroule nom, prénom et téléphone. L'email général (info@fournisseur) reste.
