@@ -51,6 +51,7 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
   const [cNom, setCNom] = useState("");
   const [cPrenom, setCPrenom] = useState("");
   const [cTel, setCTel] = useState("");
+  const [cMail, setCMail] = useState("");
   const [cOuvert, setCOuvert] = useState(false);
   const [bureau, setBureau] = useState<Champs>({ identifiant: "", mdp: "" });
   const [perso, setPerso] = useState<Champs>({ identifiant: "", mdp: "" });
@@ -64,8 +65,8 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
     const { premier, acces: a } = courant.current;
     setNom(initial?.nom ?? nomParDefaut ?? ""); setDomaine(initial?.domaine_id ?? domaineParDefaut ?? premier);
     setSite(initial?.site ?? ""); setCao(initial?.site_cao ?? ""); setNotes(initial?.notes ?? "");
-    setEmail(initial?.email ?? ""); setTelephone(initial?.telephone ?? ""); setCNom(initial?.contact_nom ?? ""); setCPrenom(initial?.contact_prenom ?? ""); setCTel(initial?.contact_telephone ?? "");
-    setCOuvert(!!(initial?.contact_nom || initial?.contact_prenom || initial?.contact_telephone));
+    setEmail(initial?.email ?? ""); setTelephone(initial?.telephone ?? ""); setCNom(initial?.contact_nom ?? ""); setCPrenom(initial?.contact_prenom ?? ""); setCTel(initial?.contact_telephone ?? ""); setCMail(initial?.contact_email ?? "");
+    setCOuvert(!!(initial?.contact_nom || initial?.contact_prenom || initial?.contact_telephone || initial?.contact_email));
     const b = initial ? a.bureau(initial.id) : null, p = initial ? a.perso(initial.id) : null;
     setBureau({ identifiant: b?.identifiant ?? "", mdp: b?.mot_de_passe ?? "" });
     setPerso({ identifiant: p?.identifiant ?? "", mdp: p?.mot_de_passe ?? "" });
@@ -73,7 +74,7 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
 
   const siteFaux = !urlOk(site) ? "Adresse du site invalide : exemple schueco.com." : "";
   const caoFaux = !urlOk(cao) ? "Adresse du site CAO invalide : exemple schueco.com." : "";
-  const contactFaux = !emailOk(email) ? "Email invalide : nom@domaine.ch."
+  const contactFaux = !emailOk(email) || !emailOk(cMail) ? "Email invalide : nom@domaine.ch."
     : !telephoneOk(telephone) || !telephoneOk(cTel) ? "Téléphone : chiffres, espaces et + seulement." : "";
 
   const enregistrer = async () => {
@@ -81,7 +82,7 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
     try {
       const id = await enregistrerFournisseur({ id: initial?.id, nom: nom.trim(), domaine_id: domaine, site: normaliserUrl(site), site_cao: normaliserUrl(cao), notes: notes.trim(),
         email: email.trim(), telephone: telephone.trim(), email_technique: initial?.email_technique ?? "",
-        contact_nom: cNom.trim(), contact_prenom: cPrenom.trim(), contact_telephone: cTel.trim() });
+        contact_nom: cNom.trim(), contact_prenom: cPrenom.trim(), contact_telephone: cTel.trim(), contact_email: cMail.trim() });
       if (!id) return;
       const okB = await enregistrerAcces(id, false, bureau.identifiant, bureau.mdp, initial ? acces.bureau(initial.id) : null);
       const okP = await enregistrerAcces(id, true, perso.identifiant, perso.mdp, initial ? acces.perso(initial.id) : null);
@@ -146,9 +147,13 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
                   <Label htmlFor="f-cprenom">Prénom</Label>
                   <Input id="f-cprenom" value={cPrenom} onChange={(e) => setCPrenom(e.target.value)} />
                 </div>
-                <div className="col-span-2 space-y-1.5">
+                <div className="space-y-1.5">
                   <Label htmlFor="f-ctel">Téléphone</Label>
                   <Input id="f-ctel" type="tel" value={cTel} aria-invalid={!telephoneOk(cTel) || undefined} onChange={(e) => setCTel(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="f-cmail">Email</Label>
+                  <Input id="f-cmail" type="email" placeholder="prenom.nom@fournisseur.ch" value={cMail} aria-invalid={!emailOk(cMail) || undefined} onChange={(e) => setCMail(e.target.value)} />
                 </div>
               </div>
             </details>

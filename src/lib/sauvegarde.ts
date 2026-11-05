@@ -17,7 +17,7 @@ export function exporter(a: Annuaire, maintenant = new Date()): FichierAccess {
     fournisseurs: a.fournisseurs.map((f) => ({
       nom: f.nom, domaine: nomDomaine.get(f.domaine_id) ?? "Sans domaine", site: f.site, site_cao: f.site_cao, notes: f.notes,
       email: f.email ?? "", telephone: f.telephone ?? "", email_technique: f.email_technique ?? "",
-      contact_nom: f.contact_nom ?? "", contact_prenom: f.contact_prenom ?? "", contact_telephone: f.contact_telephone ?? "",
+      contact_nom: f.contact_nom ?? "", contact_prenom: f.contact_prenom ?? "", contact_telephone: f.contact_telephone ?? "", contact_email: f.contact_email ?? "",
     })),
   };
 }
@@ -57,7 +57,7 @@ export function planifier(p: unknown, base: Annuaire): PlanImport {
     const ligne = {
       nom: x.nom.trim(), domaine: x.domaine.trim(), site: x.site ?? "", site_cao: x.site_cao ?? "", notes: x.notes ?? "",
       email: x.email ?? "", telephone: x.telephone ?? "", email_technique: x.email_technique ?? "",
-      contact_nom: x.contact_nom ?? "", contact_prenom: x.contact_prenom ?? "", contact_telephone: x.contact_telephone ?? "",
+      contact_nom: x.contact_nom ?? "", contact_prenom: x.contact_prenom ?? "", contact_telephone: x.contact_telephone ?? "", contact_email: x.contact_email ?? "",
     };
     const existant = parNom.get(cle(x.nom));
     if (existant) aMettreAJour.push({ ...ligne, id: existant.id }); else aAjouter.push(ligne);

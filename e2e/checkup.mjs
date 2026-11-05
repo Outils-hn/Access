@@ -160,7 +160,7 @@ try {
   await p.locator("#b-id").fill("bureau@exemple.ch");
   await p.locator("#b-mdp").fill("Bureau-42!");
   await p.getByText("Personne de contact").click();
-  await p.locator("#f-cnom").fill("Dupont"); await p.locator("#f-cprenom").fill("Marc"); await p.locator("#f-ctel").fill("+41 79 000 00 00");
+  await p.locator("#f-cnom").fill("Dupont"); await p.locator("#f-cprenom").fill("Marc"); await p.locator("#f-ctel").fill("+41 79 000 00 00"); await p.locator("#f-cmail").fill("marc.dupont@sika.ch");
   ok(!(await p.getByLabel("Email du service technique").count()), "plus de champ « Email du service technique »");
   await p.locator("#p-id").fill("alice.perso");
   await p.locator("#p-mdp").fill("Alice-perso-7");
@@ -213,7 +213,7 @@ try {
 
   const ligneSika = p2.locator("tr", { hasText: "Sika" });
   await ligneSika.getByText("Personne de contact").click();
-  ok(await ligneSika.getByText("Marc Dupont").isVisible() && await ligneSika.getByRole("link", { name: "+41 79 000 00 00" }).isVisible(), "personne de contact : nom, prénom, téléphone dépliables");
+  ok(await ligneSika.getByText("Marc Dupont").isVisible() && await ligneSika.getByRole("link", { name: "+41 79 000 00 00" }).isVisible() && await ligneSika.getByRole("link", { name: "marc.dupont@sika.ch" }).isVisible(), "personne de contact : nom, prénom, téléphone dépliables");
   await p2.getByRole("button", { name: "Sauvegarde", exact: true }).click();
   ok(await p2.getByRole("button", { name: "Télécharger" }).isDisabled(), "sans compte : téléchargement JSON désactivé");
   await p2.keyboard.press("Escape");
