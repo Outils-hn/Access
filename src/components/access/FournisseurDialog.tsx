@@ -135,7 +135,7 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
             </div>
             <details className="group rounded-md border border-border/70 px-3 py-2" open={cOuvert} onToggle={(e) => setCOuvert(e.currentTarget.open)}>
               <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium">
-                Personne de contact <span className="font-normal text-muted-foreground">(facultatif)</span>
+                <span>Personne de contact <span className="font-normal text-muted-foreground">(facultatif)</span></span>
                 <ChevronDown className="size-4 text-muted-foreground transition-transform group-open:rotate-180" />
               </summary>
               <div className="mt-3 grid grid-cols-2 gap-3">
@@ -158,7 +158,7 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
               </div>
             </details>
             {contactFaux ? <p role="alert" className="text-xs text-destructive">{contactFaux}</p>
-              : <p className="text-xs text-muted-foreground">Coordonnées publiques du fournisseur, visibles par tous .</p>}
+              : <p className="text-xs text-muted-foreground">Coordonnées publiques du fournisseur, visibles par tous.</p>}
           </fieldset>
           <BlocAcces id="b" titre="Accès du bureau" aide="Visible par tous les comptes validés." v={bureau} set={setBureau} />
           <BlocAcces id="p" titre="Mon accès perso" aide="Visible par vous seul. Laisser vide si vous utilisez celui du bureau." v={perso} set={setPerso} />
