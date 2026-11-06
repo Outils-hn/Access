@@ -4,6 +4,10 @@ Le numéro de version se met à jour dans `src/lib/version.ts` (pied de page et 
 
 Chaque version qui change quelque chose de visible pour l'équipe a une puce « Nouveauté : … », en langage courant : c'est la seule phrase affichée sur la page « Nouveautés » de l'Accueil.
 
+## 2.13 — 6 novembre 2026
+
+- Le menu des applis propose Joint (en préparation), pour le concepteur seulement : aucune Nouveauté à annoncer à l'équipe.
+
 ## 2.12 — 5 novembre 2026
 
 - Nouveauté : la « Personne de contact » d'un fournisseur a maintenant aussi un email (cliquable pour écrire, avec l'objet « Demande d'information » pré-rempli).
