@@ -410,6 +410,8 @@ body { border-top: 3px solid var(--app); }
   .tbl-cartes td:first-child { padding-left: 0; font-size: 1rem; }
   .tbl-cartes td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted-foreground); margin-bottom: 0.1rem; }
   .tbl-cartes td.truncate { overflow: visible; text-overflow: clip; }
+  /* Cases vides (« — » ou rien) : on les masque, la carte reste courte */
+  .tbl-cartes td:empty, .tbl-cartes td:has(> .vide) { display: none; }
   .tbl-cartes a { min-height: 40px; align-items: center; }
 }
 .bandeau-marque > svg:first-child { width: 22px; height: 22px; }

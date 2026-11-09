@@ -46,7 +46,7 @@ export function AccesCellule({ bureau, perso, nom, connecte }: { bureau: Acces |
       </span>
     );
   }
-  if (!bureau && !perso) return <span className="text-muted-foreground">—</span>;
+  if (!bureau && !perso) return <span className="vide text-muted-foreground">—</span>;
   return (
     <div className="space-y-1.5">
       {bureau && <Ligne a={bureau} etiquette="Bureau" nom={nom} />}

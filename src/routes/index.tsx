@@ -247,7 +247,7 @@ function LienFiches({ nom, n }: { nom: string; n: number }) {
 /** Contact general du fournisseur : email (objet « Demande d'information » pre-rempli), telephone, et une personne de contact depliable. */
 function Contact({ f }: { f: Fournisseur }) {
   const personne = [f.contact_prenom, f.contact_nom].filter(Boolean).join(" ");
-  if (!f.email && !f.telephone && !personne && !f.contact_telephone && !f.contact_email) return <span className="text-muted-foreground">—</span>;
+  if (!f.email && !f.telephone && !personne && !f.contact_telephone && !f.contact_email) return <span className="vide text-muted-foreground">—</span>;
   const lien = "inline-flex min-w-0 max-w-full items-center gap-1.5 underline-offset-2 hover:underline";
   return (
     <div className="flex min-w-0 flex-col gap-0.5 text-[13px]">
