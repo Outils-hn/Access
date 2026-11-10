@@ -302,7 +302,7 @@ try {
   const axe2 = await new AxeBuilder({ page: p3 }).withTags(["wcag2a", "wcag2aa"]).analyze();
   ok(axe2.violations.length === 0, `accessibilité (sombre) : ${axe2.violations.length} problème(s)${axe2.violations.map((v) => ` [${v.id}: ${v.nodes.length}]`).join("")}`);
   await p3.getByRole("button", { name: "Changer d'application" }).click();
-  ok((await p3.getByRole("menuitem").count()) === 11, "sélecteur : Accueil + 10 applis");
+  ok((await p3.getByRole("menuitem").count()) === 12, "sélecteur : Accueil, Rechercher + 10 applis");
 } catch (e) {
   ok(false, `arret du check-up : ${e.message.split("\n")[0]}`);
 }
