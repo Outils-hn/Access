@@ -1,9 +1,6 @@
-/** Logo : une porte (le cadre) et la fleche qui y entre, couleur framboise. */
+/** Logo : pastille de la couleur de l'appli, avec son pictogramme (meme logo que sur l'Accueil). */
 export function AccessMark({ size = 22 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 22 22" aria-hidden="true" className="shrink-0">
-      <path d="M10 3.75h7.25v14.5H10" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-foreground" />
-      <path d="M2.5 11h9.5M8.5 7.25 12.25 11 8.5 14.75" fill="none" stroke="var(--color-access)" strokeWidth="2" strokeLinecap="square" />
-    </svg>
+    <svg width={size} height={size} className="shrink-0" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="5.5" fill="#C2255C"/><g transform="translate(4.56 4.56) scale(.62)" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></g></svg>
   );
 }
