@@ -4,6 +4,10 @@ Le numéro de version se met à jour dans `src/lib/version.ts` (pied de page et 
 
 Chaque version qui change quelque chose de visible pour l'équipe a une puce « Nouveauté : … », en langage courant : c'est la seule phrase affichée sur la page « Nouveautés » de l'Accueil.
 
+## 2.20 — 10 novembre 2026
+
+- Nouveauté : un bouton « Noter dans Check » sur chaque fournisseur ouvre Check avec le début de la note déjà écrit.
+
 ## 2.19 — 9 novembre 2026
 
 - Nouveauté : au téléphone, les fiches fournisseurs n'affichent plus les rubriques vides (Contact, Accès, Notes) : les cartes sont plus courtes.
