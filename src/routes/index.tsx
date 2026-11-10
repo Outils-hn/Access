@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Box, ChevronDown, ExternalLink, FileText, Mail, Phone, Pencil, Plus, Search, Settings2, Trash2 } from "lucide-react";
+import { Box, ChevronDown, ExternalLink, FileText, Mail, NotebookPen, Phone, Pencil, Plus, Search, Settings2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -185,6 +185,8 @@ function Annuaire() {
                         <td data-label="Notes" className="text-muted-foreground"><NoteCellule texte={f.notes} /></td>
                         <td>
                           {valide && <div className="flex justify-end opacity-60 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                            <Button size="icon" variant="ghost" className="size-11 sm:size-8" aria-label={`Noter dans Check à propos de ${f.nom}`} title="Noter dans Check"
+                              onClick={() => window.open(`https://outils-hn.github.io/Check/?noter=${encodeURIComponent(`Fournisseur ${f.nom} : `)}`, "_blank", "noopener,noreferrer")}><NotebookPen className="size-4" /></Button>
                             <Button size="icon" variant="ghost" className="size-11 sm:size-8" onClick={() => setEdition({ f })} aria-label={`Modifier ${f.nom}`}><Pencil className="size-4" /></Button>
                             <Button size="icon" variant="ghost" className="size-11 text-destructive hover:text-destructive sm:size-8" onClick={() => setASupprimer(f)} aria-label={`Supprimer ${f.nom}`}><Trash2 className="size-4" /></Button>
                           </div>}

@@ -193,6 +193,8 @@ try {
   const ligneB = p2.locator("tr", { hasText: "Sika" });
   ok(await ligneB.getByText("bureau@exemple.ch").isVisible(), "Bob voit l'accès du bureau");
   ok(!(await ligneB.getByText("alice.perso").count()), "Bob ne voit PAS l'accès perso d'Alice");
+  { const [pop] = await Promise.all([p2.waitForEvent("popup"), p2.getByRole("button", { name: /Noter dans Check à propos de Schüco/ }).click()]);
+    ok(decodeURIComponent(pop.url()).startsWith("https://outils-hn.github.io/Check/?noter=Fournisseur Schüco"), "« Noter dans Check » : ouvre Check avec le nom du fournisseur"); await pop.close().catch(() => {}); }
   await p2.getByRole("button", { name: "Modifier Schüco" }).click();
   await p2.locator("#p-id").fill("bob.schueco");
   await p2.locator("#p-mdp").fill("Bob-1");
