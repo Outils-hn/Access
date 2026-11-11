@@ -11,7 +11,7 @@ import { grouper, useAcces, useActions, useAnnuaire, useFichesIndex, type Fourni
 import { INDEX_URL } from "@/lib/base";
 import { useCompte } from "@/lib/compte";
 import { compterFiches, correspond, fournisseursSansFiche, hote, lienDemande, lienTel } from "@/lib/recherche";
-import { AccesCellule } from "@/components/access/AccesCellule";
+import { AccesCellule, BoutonCopier } from "@/components/access/AccesCellule";
 import { FournisseurDialog } from "@/components/access/FournisseurDialog";
 import { DomainesDialog } from "@/components/access/DomainesDialog";
 
@@ -253,7 +253,12 @@ function Contact({ f }: { f: Fournisseur }) {
   const lien = "inline-flex min-w-0 max-w-full items-center gap-1.5 underline-offset-2 hover:underline";
   return (
     <div className="flex min-w-0 flex-col gap-0.5 text-[13px]">
-      {f.email && <a href={lienDemande(f.email, f.nom)} className={lien} title={`Écrire à ${f.email}`}><Mail className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.email}</span></a>}
+      {f.email && (
+        <span className="flex min-w-0 items-center gap-1">
+          <a href={lienDemande(f.email, f.nom)} className={lien} title={`Écrire à ${f.email}`}><Mail className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.email}</span></a>
+          <BoutonCopier texte={f.email} quoi="Email" label={`Copier l'adresse mail de ${f.nom}`} />
+        </span>
+      )}
       {f.telephone && <a href={lienTel(f.telephone)} className={lien} title={`Appeler ${f.nom}`}><Phone className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate tabular-nums">{f.telephone}</span></a>}
       {(personne || f.contact_telephone || f.contact_email) && (
         <details className="group">
@@ -262,7 +267,12 @@ function Contact({ f }: { f: Fournisseur }) {
           </summary>
           <div className="mt-0.5 flex flex-col gap-0.5 pl-0.5">
             {personne && <span className="truncate">{personne}</span>}
-            {f.contact_email && <a href={lienDemande(f.contact_email, f.nom)} className={lien} title={`Écrire à ${f.contact_email}`}><Mail className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.contact_email}</span></a>}
+            {f.contact_email && (
+              <span className="flex min-w-0 items-center gap-1">
+                <a href={lienDemande(f.contact_email, f.nom)} className={lien} title={`Écrire à ${f.contact_email}`}><Mail className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.contact_email}</span></a>
+                <BoutonCopier texte={f.contact_email} quoi="Email" label={`Copier l'adresse mail de ${personne || f.nom}`} />
+              </span>
+            )}
             {f.contact_telephone && <a href={lienTel(f.contact_telephone)} className={lien} title={`Appeler ${personne || f.nom}`}><Phone className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate tabular-nums">{f.contact_telephone}</span></a>}
           </div>
         </details>

@@ -10,6 +10,11 @@ async function copier(texte: string, quoi: string) {
 
 const btn = "inline-flex size-10 shrink-0 sm:size-6 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground";
 
+/** Petit bouton « copier » (meme style que pour les acces), reutilise pour les emails du fournisseur. */
+export function BoutonCopier({ texte, quoi, label }: { texte: string; quoi: string; label: string }) {
+  return <button type="button" className={btn} onClick={() => copier(texte, quoi)} aria-label={label} title={label}><Copy className="size-3.5" /></button>;
+}
+
 /** Un acces (bureau ou perso) : identifiant + mot de passe masque, boutons copier. */
 function Ligne({ a, etiquette, nom }: { a: Acces; etiquette: string; nom: string }) {
   const [voir, setVoir] = useState(false);
