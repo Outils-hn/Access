@@ -256,7 +256,7 @@ function Contact({ f }: { f: Fournisseur }) {
       {f.email && (
         <span className="flex min-w-0 items-center gap-1">
           <a href={lienDemande(f.email, f.nom)} className={lien} title={`Écrire à ${f.email}`}><Mail className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.email}</span></a>
-          <BoutonCopier texte={f.email} quoi="Email" label={`Copier l'email de ${f.nom}`} />
+          <BoutonCopier texte={f.email} quoi="Email" label={`Copier l'adresse mail de ${f.nom}`} />
         </span>
       )}
       {f.telephone && <a href={lienTel(f.telephone)} className={lien} title={`Appeler ${f.nom}`}><Phone className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate tabular-nums">{f.telephone}</span></a>}
@@ -270,7 +270,7 @@ function Contact({ f }: { f: Fournisseur }) {
             {f.contact_email && (
               <span className="flex min-w-0 items-center gap-1">
                 <a href={lienDemande(f.contact_email, f.nom)} className={lien} title={`Écrire à ${f.contact_email}`}><Mail className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{f.contact_email}</span></a>
-                <BoutonCopier texte={f.contact_email} quoi="Email" label={`Copier l'email de ${personne || f.nom}`} />
+                <BoutonCopier texte={f.contact_email} quoi="Email" label={`Copier l'adresse mail de ${personne || f.nom}`} />
               </span>
             )}
             {f.contact_telephone && <a href={lienTel(f.contact_telephone)} className={lien} title={`Appeler ${personne || f.nom}`}><Phone className="size-3.5 shrink-0 text-muted-foreground" /><span className="truncate tabular-nums">{f.contact_telephone}</span></a>}

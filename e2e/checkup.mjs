@@ -184,7 +184,7 @@ try {
   ok((await ligne.getByText("••••••••").count()) === 2, "mots de passe masqués par défaut");
   await ligne.getByRole("button", { name: /Copier le mot de passe perso/ }).click();
   ok((await p.evaluate(() => navigator.clipboard.readText())) === "Alice-perso-7", "bouton copier : mot de passe perso dans le presse-papier");
-  await ligne.getByRole("button", { name: "Copier l'email de Sika" }).click();
+  await ligne.getByRole("button", { name: "Copier l'adresse mail de Sika" }).click();
   ok((await p.evaluate(() => navigator.clipboard.readText())) === "info@sika.ch", "bouton copier : email du fournisseur dans le presse-papier");
   await shot(p, "05-alice");
 
