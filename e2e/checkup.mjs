@@ -12,7 +12,7 @@ const lignes = [];
 const ok = (cond, msg) => { lignes.push(`${cond ? "OK" : "ECHEC"} ${msg}`); console.log(`${cond ? "OK" : "ECHEC"} ${msg}`); };
 
 const COMPTES = {
-  "alice@exemple.ch": { id: "11111111-1111-4111-8111-111111111111", valide: true },
+  "alice@exemple.ch": { id: "11111111-1111-4111-8111-111111111111", valide: true, concepteur: true },
   "bob@exemple.ch": { id: "22222222-2222-4222-8222-222222222222", valide: true },
   "carl@exemple.ch": { id: "33333333-3333-4333-8333-333333333333", valide: false },
 };
@@ -38,8 +38,9 @@ const utilisateur = (req) => {
   const tok = (req.headers()["authorization"] || "").replace("Bearer ", "");
   return tok.startsWith("tok-") ? tok.slice(4) : null;
 };
+const concepteur = (u) => !!u && !!parId(u)?.[1].concepteur;
 const valide = (u) => !!u && !!parId(u)?.[1].valide;
-const visible = (table, u, row) => table !== "access_acces" || (valide(u) && (row.proprietaire === null || row.proprietaire === u));
+const visible = (table, u, row) => table !== "access_acces" || (valide(u) && (row.proprietaire === null || (row.proprietaire === u && concepteur(u))));
 const filtreId = (url) => url.searchParams.get("id")?.replace(/^eq\./, "");
 
 async function brancher(ctx) {
@@ -58,6 +59,7 @@ async function brancher(ctx) {
     if (u.pathname === "/auth/v1/logout") return r.fulfill({ status: 204, body: "" });
     if (u.pathname === "/auth/v1/user") { const e = parId(moi); return e ? json({ id: moi, email: e[0], aud: "authenticated", role: "authenticated" }) : json({ msg: "no" }, 401); }
     if (u.pathname === "/rest/v1/rpc/is_approved") return json(valide(moi));
+    if (u.pathname === "/rest/v1/rpc/is_concepteur") return json(concepteur(moi));
     const table = u.pathname.replace("/rest/v1/", "");
     if (table === "products") return json(FICHES);
     if (!(table in etat)) return json([]);
@@ -67,6 +69,7 @@ async function brancher(ctx) {
     if (!valide(moi)) return json({ code: "42501", message: "new row violates row-level security policy" }, 403);
     const corps = req.postData() ? JSON.parse(req.postData()) : null;
     etat.ecritures.push({ table, m, corps, moi });
+    if (table === "access_acces" && !concepteur(moi)) return json({ code: "42501", message: "new row violates row-level security policy" }, 403);
     const unique = (req.headers()["accept"] || "").includes("vnd.pgrst.object");
     if (m === "POST") {
       const rows = (Array.isArray(corps) ? corps : [corps]).map((x) => ({ id: uid(), ...x }));
@@ -197,14 +200,12 @@ try {
   ok(!(await ligneB.getByText("alice.perso").count()), "Bob ne voit PAS l'accès perso d'Alice");
   { const [pop] = await Promise.all([p2.waitForEvent("popup"), p2.getByRole("button", { name: /Noter dans Check à propos de Schüco/ }).click()]);
     ok(decodeURIComponent(pop.url()).startsWith("https://outils-hn.github.io/Check/?noter=Fournisseur Schüco"), "« Noter dans Check » : ouvre Check avec le nom du fournisseur"); await pop.close().catch(() => {}); }
+  // Seul le concepteur enregistre des identifiants : Bob ne voit aucun champ d'accès dans la fiche
   await p2.getByRole("button", { name: "Modifier Schüco" }).click();
-  await p2.locator("#p-id").fill("bob.schueco");
-  await p2.locator("#p-mdp").fill("Bob-1");
+  ok(!(await p2.locator("#b-id").count()) && !(await p2.locator("#p-id").count()) && await p2.getByText(/enregistrés par le concepteur/).isVisible(), "Bob : pas de champ identifiant ni mot de passe, message explicatif");
   await p2.getByRole("button", { name: "Enregistrer", exact: true }).click();
-  await p2.waitForTimeout(1500);
-  ok(await p2.locator("tr", { hasText: "Schüco" }).getByText("bob.schueco").isVisible(), "Bob ajoute son accès perso");
-  await p.reload(); await p.waitForLoadState("networkidle"); await p.waitForTimeout(1000);
-  ok(!(await p.getByText("bob.schueco").count()), "Alice ne voit pas l'accès perso de Bob");
+  await p2.waitForTimeout(1200);
+  ok(!etat.ecritures.some((e) => e.table === "access_acces" && e.moi === COMPTES["bob@exemple.ch"].id), "Bob : aucune écriture d'accès envoyée");
   await shot(p2, "06-bob");
 
   // 6. Deconnexion : plus aucun acces visible

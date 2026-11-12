@@ -4,8 +4,9 @@
 -- - « access_domaines » et « access_fournisseurs » : lecture libre (noms, liens, notes),
 --   ajout / modification / suppression reserves aux comptes VALIDES dans Index.
 -- - « access_acces » : identifiants des sites fournisseurs.
---     proprietaire vide  = acces du bureau, visible et modifiable par tous les comptes valides ;
---     proprietaire = moi = acces perso, visible et modifiable par moi seul.
+--     proprietaire vide  = acces du bureau : visible par tous les comptes valides ;
+--     proprietaire = moi = acces perso, visible par moi seul.
+--     ENREGISTRER (ajout, modification, retrait) : reserve au CONCEPTEUR (public.is_concepteur()).
 --   Jamais lisible sans compte valide.
 
 create table if not exists public.access_domaines (
@@ -57,13 +58,14 @@ create policy "ecriture domaines" on public.access_domaines for all to authentic
 create policy "lecture fournisseurs" on public.access_fournisseurs for select to anon, authenticated using (true);
 create policy "ecriture fournisseurs" on public.access_fournisseurs for all to authenticated using (public.is_approved()) with check (public.is_approved());
 
--- Acces : comptes valides seulement ; le bureau pour tous, le perso pour son proprietaire
+-- Acces : lecture par les comptes valides (bureau pour tous, perso pour son proprietaire) ;
+-- ecriture reservee au concepteur, qui reste le seul a pouvoir stocker des mots de passe
 create policy "lecture acces" on public.access_acces for select to authenticated
-  using (public.is_approved() and (proprietaire is null or proprietaire = auth.uid()));
+  using (public.is_approved() and (proprietaire is null or (proprietaire = auth.uid() and public.is_concepteur())));
 create policy "ajout acces" on public.access_acces for insert to authenticated
-  with check (public.is_approved() and (proprietaire is null or proprietaire = auth.uid()));
+  with check (public.is_concepteur() and (proprietaire is null or proprietaire = auth.uid()));
 create policy "modif acces" on public.access_acces for update to authenticated
-  using (public.is_approved() and (proprietaire is null or proprietaire = auth.uid()))
-  with check (public.is_approved() and (proprietaire is null or proprietaire = auth.uid()));
+  using (public.is_concepteur() and (proprietaire is null or proprietaire = auth.uid()))
+  with check (public.is_concepteur() and (proprietaire is null or proprietaire = auth.uid()));
 create policy "retrait acces" on public.access_acces for delete to authenticated
-  using (public.is_approved() and (proprietaire is null or proprietaire = auth.uid()));
+  using (public.is_concepteur() and (proprietaire is null or proprietaire = auth.uid()));

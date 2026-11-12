@@ -1,9 +1,9 @@
 // Point unique de verite pour l'identite de l'application.
 // Mettre a jour la version ICI uniquement : pied de page et fenetre « À propos » lisent ces constantes.
 export const APP_NAME = "Access";
-export const APP_VERSION = "2.31";
+export const APP_VERSION = "2.32";
 export const APP_AUTHOR = "Hugo N.";
 export const APP_YEAR = "2026";
-export const APP_UPDATED = "7 novembre 2026";
+export const APP_UPDATED = "12 novembre 2026";
 export const APP_TAGLINE =
   "Annuaire des fournisseurs de façade : sites, sites CAO et accès chiffrés, classés par domaine.";
