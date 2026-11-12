@@ -27,7 +27,17 @@ export function useCompte() {
       return !!data;
     },
   });
-  return { pret, session, uid, email: session?.user?.email ?? "", nom: nomAffiche(session?.user), valide: !!uid && valide.data === true, enAttente: !!uid && valide.data === false };
+  // Seul le concepteur (Hugo) peut enregistrer des identifiants et mots de passe
+  const concepteur = useQuery({
+    queryKey: ["access", "concepteur", uid],
+    enabled: !!uid,
+    queryFn: async () => {
+      const { data, error } = await db.rpc("is_concepteur");
+      if (error) throw error;
+      return !!data;
+    },
+  });
+  return { pret, session, uid, concepteur: !!uid && concepteur.data === true, email: session?.user?.email ?? "", nom: nomAffiche(session?.user), valide: !!uid && valide.data === true, enAttente: !!uid && valide.data === false };
 }
 
 export async function connexion(email: string, motDePasse: string): Promise<string | null> {

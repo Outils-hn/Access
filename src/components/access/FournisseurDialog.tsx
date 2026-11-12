@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useCompte } from "@/lib/compte";
 import { useAcces, useActions, useAnnuaire, type Fournisseur } from "@/lib/donnees";
 import { emailOk, normaliserUrl, telephoneOk, urlOk } from "@/lib/recherche";
 
@@ -40,6 +41,7 @@ function BlocAcces({ id, titre, aide, v, set }: { id: string; titre: string; aid
 export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefaut, nomParDefaut }: Props) {
   const { domaines } = useAnnuaire();
   const acces = useAcces();
+  const { concepteur } = useCompte();
   const { enregistrerFournisseur, enregistrerAcces } = useActions();
   const [nom, setNom] = useState("");
   const [domaine, setDomaine] = useState("");
@@ -84,8 +86,9 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
         email: email.trim(), telephone: telephone.trim(), email_technique: initial?.email_technique ?? "",
         contact_nom: cNom.trim(), contact_prenom: cPrenom.trim(), contact_telephone: cTel.trim(), contact_email: cMail.trim() });
       if (!id) return;
-      const okB = await enregistrerAcces(id, false, bureau.identifiant, bureau.mdp, initial ? acces.bureau(initial.id) : null);
-      const okP = await enregistrerAcces(id, true, perso.identifiant, perso.mdp, initial ? acces.perso(initial.id) : null);
+      // Identifiants : reserves au concepteur ; pour les autres comptes, rien n'est lu ni ecrit
+      const okB = !concepteur || await enregistrerAcces(id, false, bureau.identifiant, bureau.mdp, initial ? acces.bureau(initial.id) : null);
+      const okP = !concepteur || await enregistrerAcces(id, true, perso.identifiant, perso.mdp, initial ? acces.perso(initial.id) : null);
       if (okB && okP) onOpenChange(false);
     } finally { setBusy(false); }
   };
@@ -160,8 +163,12 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
             {contactFaux ? <p role="alert" className="text-xs text-destructive">{contactFaux}</p>
               : <p className="text-xs text-muted-foreground">Coordonnées publiques du fournisseur, visibles par tous.</p>}
           </fieldset>
-          <BlocAcces id="b" titre="Accès du bureau" aide="Visible par tous les comptes validés." v={bureau} set={setBureau} />
-          <BlocAcces id="p" titre="Mon accès perso" aide="Visible par vous seul. Laisser vide si vous utilisez celui du bureau." v={perso} set={setPerso} />
+          {concepteur ? (<>
+            <BlocAcces id="b" titre="Accès du bureau" aide="Visible par tous les comptes validés." v={bureau} set={setBureau} />
+            <BlocAcces id="p" titre="Mon accès perso" aide="Visible par vous seul. Laisser vide si vous utilisez celui du bureau." v={perso} set={setPerso} />
+          </>) : (
+            <p className="rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground">Les identifiants et mots de passe sont enregistrés par le concepteur de l'application. Vous voyez ceux qu'il partage avec le bureau.</p>
+          )}
           <div className="space-y-1.5">
             <Label htmlFor="f-notes">Notes</Label>
             <Textarea id="f-notes" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
