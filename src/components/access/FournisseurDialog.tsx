@@ -167,7 +167,7 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
             <BlocAcces id="b" titre="Accès du bureau" aide="Visible par tous les comptes validés." v={bureau} set={setBureau} />
             <BlocAcces id="p" titre="Mon accès perso" aide="Visible par vous seul. Laisser vide si vous utilisez celui du bureau." v={perso} set={setPerso} />
           </>) : (
-            <p className="rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground">Pour des raisons de sécurité, seul le concepteur peut enregistrer des identifiants. Vous voyez ceux qu'il partage avec le bureau.</p>
+            <p className="rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground">Pour des raisons de sécurité, vous voyez uniquement les accès partagés avec le bureau.</p>
           )}
           <div className="space-y-1.5">
             <Label htmlFor="f-notes">Notes</Label>

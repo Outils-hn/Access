@@ -4,6 +4,10 @@ Le numéro de version se met à jour dans `src/lib/version.ts` (pied de page et 
 
 Chaque version qui change quelque chose de visible pour l'équipe a une puce « Nouveauté : … », en langage courant : c'est la seule phrase affichée sur la page « Nouveautés » de l'Accueil.
 
+## 2.34 — 12 novembre 2026
+
+- Nouveauté : le message de la fiche fournisseur est plus simple : « Pour des raisons de sécurité, vous voyez uniquement les accès partagés avec le bureau. »
+
 ## 2.33 — 12 novembre 2026
 
 - Nouveauté : dans la fiche d'un fournisseur, un message explique que, pour des raisons de sécurité, seul le concepteur enregistre les identifiants.
