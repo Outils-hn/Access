@@ -202,7 +202,7 @@ try {
     ok(decodeURIComponent(pop.url()).startsWith("https://outils-hn.github.io/Check/?noter=Fournisseur Schüco"), "« Noter dans Check » : ouvre Check avec le nom du fournisseur"); await pop.close().catch(() => {}); }
   // Seul le concepteur enregistre des identifiants : Bob ne voit aucun champ d'accès dans la fiche
   await p2.getByRole("button", { name: "Modifier Schüco" }).click();
-  ok(!(await p2.locator("#b-id").count()) && !(await p2.locator("#p-id").count()) && await p2.getByText(/seul le concepteur peut enregistrer des identifiants/).isVisible(), "Bob : pas de champ identifiant ni mot de passe, message explicatif");
+  ok(!(await p2.locator("#b-id").count()) && !(await p2.locator("#p-id").count()) && await p2.getByText(/vous voyez uniquement les accès partagés avec le bureau/).isVisible(), "Bob : pas de champ identifiant ni mot de passe, message explicatif");
   await p2.getByRole("button", { name: "Enregistrer", exact: true }).click();
   await p2.waitForTimeout(1200);
   ok(!etat.ecritures.some((e) => e.table === "access_acces" && e.moi === COMPTES["bob@exemple.ch"].id), "Bob : aucune écriture d'accès envoyée");
