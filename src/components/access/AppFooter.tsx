@@ -1,4 +1,5 @@
 import { LienRetour } from "./LienRetour";
+import { RaccourcisApplis, useToucheAide } from "./RaccourcisApplis";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { APP_AUTHOR, APP_NAME, APP_TAGLINE, APP_UPDATED, APP_VERSION, APP_YEAR } from "@/lib/version";
@@ -8,6 +9,8 @@ import { SauvegardeDialog } from "./SauvegardeDialog";
 /** Signature discrete, identique aux autres applis : « Conçu par … » ouvre la fenetre « À propos ». */
 export function AppFooter() {
   const [open, setOpen] = useState(false);
+  const [raccourcis, setRaccourcis] = useState(false);
+  useToucheAide(() => setRaccourcis(true));
   const [sauvegarde, setSauvegarde] = useState(false);
   const lien = "text-inherit underline-offset-2 transition-colors hover:text-foreground hover:underline";
   return (
@@ -17,7 +20,8 @@ export function AppFooter() {
         <button type="button" onClick={() => setOpen(true)} className={lien}>Conçu par {APP_AUTHOR}</button>{" "}
         · {APP_YEAR} ·{" "}
         <button type="button" onClick={() => setSauvegarde(true)} className={lien}>Sauvegarde</button> ·{" "}
-        <LienRetour app="Access" version={APP_VERSION} className={lien} />
+        <button type="button" onClick={() => setRaccourcis(true)} className="text-inherit underline-offset-2 transition-colors hover:text-foreground hover:underline">Raccourcis</button>{" "}
+        · <LienRetour app="Access" version={APP_VERSION} className={lien} />
       </p>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-sm text-left">
@@ -38,6 +42,7 @@ export function AppFooter() {
         </DialogContent>
       </Dialog>
       <SauvegardeDialog open={sauvegarde} onOpenChange={setSauvegarde} />
+      <RaccourcisApplis app="Access" open={raccourcis} onOpenChange={setRaccourcis} />
     </footer>
   );
 }
