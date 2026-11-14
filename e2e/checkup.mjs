@@ -234,7 +234,7 @@ try {
   ok(JSON.parse(brut).fournisseurs.length === 4, "sauvegarde téléchargée (4 fournisseurs)");
   ok(!/Bureau-42|Alice-perso|bureau@exemple|alice\.perso/.test(brut), "la sauvegarde ne contient aucun identifiant ni mot de passe");
   await p.keyboard.press("Escape");
-  await p.getByRole("button", { name: /Conçu par/ }).click();
+  await p.getByRole("button", { name: /À propos/ }).click();
   ok(await p.getByText("Conçu et développé par Hugo N.").isVisible(), "fenêtre À propos");
   await p.keyboard.press("Escape");
   const copie = await p.evaluate(() => localStorage.getItem("access-copie-locale") || "");

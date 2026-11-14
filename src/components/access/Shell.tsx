@@ -55,7 +55,6 @@ export function Shell({ children }: { children: ReactNode }) {
         statut={<>
           {pret && !uid && (
             <>
-              <span className="bandeau-statut">Lecture seule</span>
               <button className="bandeau-btn" onClick={() => setConnexion(true)}><LogIn /> Se connecter</button>
             </>
           )}
