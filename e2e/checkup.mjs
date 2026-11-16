@@ -4,6 +4,7 @@
 import { chromium } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 import fs from "node:fs";
+import { detailsVisuels } from "./details.mjs";
 
 const out = process.argv[2] || "out";
 const URL0 = "http://127.0.0.1:8080";
@@ -99,7 +100,7 @@ async function page({ dark = false, largeur = 1440 } = {}) {
   p.on("pageerror", (e) => ok(false, `erreur JS : ${e.message}`));
   return p;
 }
-const shot = async (p, nom) => { await p.waitForTimeout(500); await p.screenshot({ path: `${out}/${nom}.png`, fullPage: true }); };
+const shot = async (p, nom) => { await p.waitForTimeout(500); await p.screenshot({ path: `${out}/${nom}.png`, fullPage: true }); await detailsVisuels(p, nom, lignes); };
 async function seConnecter(p, email, mdp = MDP) {
   await p.getByRole("button", { name: "Se connecter" }).first().click();
   await p.getByLabel("Email").fill(email);
