@@ -163,8 +163,13 @@ try {
   await p.getByLabel("Site", { exact: true }).fill("sika.ch");
   await p.locator("#b-id").fill("bureau@exemple.ch");
   await p.locator("#b-mdp").fill("Bureau-42!");
-  await p.getByText("Personne de contact").click();
-  await p.locator("#f-cnom").fill("Dupont"); await p.locator("#f-cprenom").fill("Marc"); await p.locator("#f-ctel").fill("+41 79 000 00 00"); await p.locator("#f-cmail").fill("marc.dupont@sika.ch");
+  await p.getByText("Personnes de contact").click();
+  await p.getByRole("button", { name: "Ajouter une personne" }).click();
+  await p.locator("#c0-service").fill("Bois"); await p.locator("#c0-nom").fill("Dupont"); await p.locator("#c0-prenom").fill("Marc"); await p.locator("#c0-tel").fill("+41 79 000 00 00"); await p.locator("#c0-mail").fill("marc.dupont@sika.ch");
+  await p.getByRole("button", { name: "Ajouter une personne" }).click();
+  await p.locator("#c1-service").fill("Isolation"); await p.locator("#c1-nom").fill("Martin"); await p.locator("#c1-prenom").fill("Julie"); await p.locator("#c1-mail").fill("julie.martin@sika.ch");
+  await p.getByRole("button", { name: "Ajouter une personne" }).click();
+  await p.getByRole("button", { name: "Retirer la personne de contact 3" }).click();
   ok(!(await p.getByLabel("Email du service technique").count()), "plus de champ « Email du service technique »");
   await p.locator("#p-id").fill("alice.perso");
   await p.locator("#p-mdp").fill("Alice-perso-7");
@@ -218,8 +223,10 @@ try {
   ok((await p2.locator("tr", { hasText: "Sika" }).getByRole("link", { name: "+41 58 436 40 40" }).getAttribute("href")) === "tel:+41584364040", "téléphone cliquable");
 
   const ligneSika = p2.locator("tr", { hasText: "Sika" });
-  await ligneSika.getByText("Personne de contact").click();
-  ok(await ligneSika.getByText("Marc Dupont").isVisible() && await ligneSika.getByRole("link", { name: "+41 79 000 00 00" }).isVisible() && await ligneSika.getByRole("link", { name: "marc.dupont@sika.ch" }).isVisible(), "personne de contact : nom, prénom, téléphone dépliables");
+  ok((etat.access_fournisseurs.find((f) => f.nom === "Sika")?.contacts ?? []).length === 2, "la ligne vide ajoutée puis retirée n'est pas enregistrée : 2 personnes de contact");
+  await ligneSika.getByText("2 personnes de contact").click();
+  ok(await ligneSika.getByText("Bois").isVisible() && await ligneSika.getByText("Marc Dupont").isVisible() && await ligneSika.getByRole("link", { name: "+41 79 000 00 00" }).isVisible() && await ligneSika.getByRole("link", { name: "marc.dupont@sika.ch" }).isVisible(), "personne de contact « Bois » : service, nom, téléphone, email");
+  ok(await ligneSika.getByText("Isolation").isVisible() && await ligneSika.getByText("Julie Martin").isVisible() && await ligneSika.getByRole("link", { name: "julie.martin@sika.ch" }).isVisible(), "deuxième personne de contact « Isolation »");
   await p2.getByRole("button", { name: "Sauvegarde", exact: true }).click();
   ok(await p2.getByRole("button", { name: "Télécharger" }).isDisabled(), "sans compte : téléchargement JSON désactivé");
   await p2.keyboard.press("Escape");
