@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useCompte } from "@/lib/compte";
+import { ChampSuggestions } from "@/components/access/ChampSuggestions";
 import { contactRempli, contactVide, useAcces, useActions, useAnnuaire, type Contact, type Fournisseur } from "@/lib/donnees";
 import { emailOk, normaliserUrl, telephoneOk, urlOk } from "@/lib/recherche";
 
@@ -96,7 +97,9 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] max-w-xl overflow-y-auto">
+      <DialogContent className="max-h-[92vh] max-w-xl overflow-y-auto"
+        // Echap avec la liste de suggestions ouverte : ferme seulement la liste, pas la fenetre
+        onEscapeKeyDown={(e) => { const el = document.activeElement; if (el?.getAttribute("role") === "combobox" && el.getAttribute("aria-expanded") === "true") e.preventDefault(); }}>
         <DialogHeader>
           <DialogTitle>{initial ? `Modifier ${initial.nom}` : "Nouveau fournisseur"}</DialogTitle>
           <DialogDescription className="sr-only">Nom, domaine, liens et accès du fournisseur</DialogDescription>
@@ -142,14 +145,13 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
                 <span>Personnes de contact <span className="font-normal text-muted-foreground">(facultatif)</span></span>
                 <ChevronDown className="size-4 text-muted-foreground transition-transform group-open:rotate-180" />
               </summary>
-              <datalist id="f-services">{services.map((x) => <option key={x} value={x} />)}</datalist>
               <div className="mt-3 space-y-3">
                 {contacts.map((c, i) => (
                   <div key={i} role="group" aria-label={`Personne de contact ${i + 1}`} className="space-y-3 rounded-md border border-border/70 p-3">
                     <div className="flex items-end gap-2">
                       <div className="min-w-0 flex-1 space-y-1.5">
                         <Label htmlFor={`c${i}-service`}>Service</Label>
-                        <Input id={`c${i}-service`} list="f-services" placeholder="Bois, Isolation…" maxLength={60} value={c.service} onChange={(e) => changer(i, "service", e.target.value)} />
+                        <ChampSuggestions id={`c${i}-service`} suggestions={services} placeholder="Bois, Isolation…" valeur={c.service} onChange={(v) => changer(i, "service", v)} />
                       </div>
                       <Button type="button" variant="ghost" size="icon" aria-label={`Retirer la personne de contact ${i + 1}`} title="Retirer cette personne" onClick={() => setContacts((l) => l.filter((_, j) => j !== i))}><Trash2 className="size-4" /></Button>
                     </div>

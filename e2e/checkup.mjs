@@ -169,6 +169,13 @@ try {
   await p.getByRole("button", { name: "Ajouter une personne" }).click();
   await p.locator("#c1-service").fill("Isolation"); await p.locator("#c1-nom").fill("Martin"); await p.locator("#c1-prenom").fill("Julie"); await p.locator("#c1-mail").fill("julie.martin@sika.ch");
   await p.getByRole("button", { name: "Ajouter une personne" }).click();
+  await p.locator("#c2-service").fill("iso");
+  ok(await p.getByRole("option", { name: "Isolation" }).isVisible(), "service : « iso » propose « Isolation » (liste maison)");
+  await p.keyboard.press("Escape");
+  ok(!(await p.getByRole("listbox").count()) && await p.getByLabel("Nom *").isVisible(), "service : Échap ferme la liste, pas la fenêtre");
+  await p.locator("#c2-service").fill("is");
+  await p.getByRole("option", { name: "Isolation" }).click();
+  ok(await p.locator("#c2-service").inputValue() === "Isolation", "service : clic sur la suggestion remplit le champ");
   await p.getByRole("button", { name: "Retirer la personne de contact 3" }).click();
   ok(!(await p.getByLabel("Email du service technique").count()), "plus de champ « Email du service technique »");
   await p.locator("#p-id").fill("alice.perso");
