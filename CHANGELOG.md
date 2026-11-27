@@ -4,6 +4,10 @@ Le numéro de version se met à jour dans `src/lib/version.ts` (pied de page et 
 
 Chaque version qui change quelque chose de visible pour l'équipe a une puce « Nouveauté : … », en langage courant : c'est la seule phrase affichée sur la page « Nouveautés » de l'Accueil.
 
+## 2.41 — 27 novembre 2026
+
+- Nouveauté : la liste des services proposés dans les personnes de contact prend les couleurs de l'appli, comme les autres listes.
+
 ## 2.40 — 27 novembre 2026
 
 - Nouveauté : un fournisseur peut avoir plusieurs personnes de contact, chacune avec son service (Bois, Isolation…). Les anciens contacts sont repris automatiquement.
