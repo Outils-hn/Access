@@ -36,7 +36,7 @@ async function charger(): Promise<Annuaire> {
     ]);
     const err = d.error || f.error;
     if (err) throw err;
-    const a: Annuaire = { domaines: d.data ?? [], fournisseurs: (f.data ?? []).map((x) => ({ ...x, contacts: lireContacts((x as { contacts?: unknown }).contacts) })) };
+    const a: Annuaire = { domaines: d.data ?? [], fournisseurs: (f.data ?? []).map((x: Fournisseur) => ({ ...x, contacts: lireContacts(x.contacts) })) };
     // Copie locale SANS les acces : seulement noms, liens et notes
     try { localStorage.setItem(COPIE, JSON.stringify({ ...a, le: new Date().toISOString() })); } catch { /* stockage plein ou bloque */ }
     return a;
