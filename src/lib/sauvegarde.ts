@@ -1,10 +1,10 @@
-import type { Annuaire, Domaine, Fournisseur } from "@/lib/donnees";
+import { lireContacts, type Annuaire, type Domaine, type Fournisseur } from "@/lib/donnees";
 
 // Sauvegarde Access : un fichier JSON avec domaines et fournisseurs (noms, liens, notes).
 // Les identifiants des sites n'y sont JAMAIS : un fichier se perd ou se transfere trop facilement.
 
 export type FichierAccess = {
-  app: "access"; version: 2; le: string;
+  app: "access"; version: 3; le: string;
   domaines: Pick<Domaine, "nom" | "ordre">[];
   fournisseurs: (Omit<Fournisseur, "id" | "domaine_id" | "updated_at"> & { domaine: string })[];
 };
@@ -12,12 +12,12 @@ export type FichierAccess = {
 export function exporter(a: Annuaire, maintenant = new Date()): FichierAccess {
   const nomDomaine = new Map(a.domaines.map((d) => [d.id, d.nom]));
   return {
-    app: "access", version: 2, le: maintenant.toISOString(),
+    app: "access", version: 3, le: maintenant.toISOString(),
     domaines: a.domaines.map((d) => ({ nom: d.nom, ordre: d.ordre })),
     fournisseurs: a.fournisseurs.map((f) => ({
       nom: f.nom, domaine: nomDomaine.get(f.domaine_id) ?? "Sans domaine", site: f.site, site_cao: f.site_cao, notes: f.notes,
       email: f.email ?? "", telephone: f.telephone ?? "", email_technique: f.email_technique ?? "",
-      contact_nom: f.contact_nom ?? "", contact_prenom: f.contact_prenom ?? "", contact_telephone: f.contact_telephone ?? "", contact_email: f.contact_email ?? "",
+      contacts: f.contacts ?? [],
     })),
   };
 }
@@ -57,10 +57,17 @@ export function planifier(p: unknown, base: Annuaire): PlanImport {
     const ligne = {
       nom: x.nom.trim(), domaine: x.domaine.trim(), site: x.site ?? "", site_cao: x.site_cao ?? "", notes: x.notes ?? "",
       email: x.email ?? "", telephone: x.telephone ?? "", email_technique: x.email_technique ?? "",
-      contact_nom: x.contact_nom ?? "", contact_prenom: x.contact_prenom ?? "", contact_telephone: x.contact_telephone ?? "", contact_email: x.contact_email ?? "",
+      contacts: contactsDuFichier(x),
     };
     const existant = parNom.get(cle(x.nom));
     if (existant) aMettreAJour.push({ ...ligne, id: existant.id }); else aAjouter.push(ligne);
   }
   return { domainesACreer, aAjouter, aMettreAJour };
+}
+
+/** Les anciennes sauvegardes (version 2) n'avaient qu'une personne : contact_nom, contact_prenom... */
+function contactsDuFichier(x: unknown): FichierAccess["fournisseurs"][number]["contacts"] {
+  const o = (x ?? {}) as Record<string, unknown>;
+  if (Array.isArray(o.contacts)) return lireContacts(o.contacts);
+  return lireContacts([{ nom: o.contact_nom, prenom: o.contact_prenom, telephone: o.contact_telephone, email: o.contact_email }]);
 }

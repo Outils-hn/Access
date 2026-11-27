@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { compterFiches, fournisseursSansFiche, correspond, emailOk, hote, lienDemande, lienTel, normaliserUrl, sansAccents, telephoneOk, urlOk } from "./recherche";
 import { exporter, planifier } from "./sauvegarde";
-import { grouper, type Annuaire } from "./donnees";
+import { grouper, lireContacts, type Annuaire } from "./donnees";
 
 describe("recherche", () => {
   it("ignore accents et majuscules", () => {
@@ -33,8 +33,8 @@ describe("recherche", () => {
 const base: Annuaire = {
   domaines: [{ id: "d2", nom: "Acier", ordre: 2 }, { id: "d1", nom: "Menuiserie alu", ordre: 1 }],
   fournisseurs: [
-    { id: "f1", nom: "Schüco", domaine_id: "d1", site: "", site_cao: "", notes: "", email: "", telephone: "", email_technique: "", contact_nom: "", contact_prenom: "", contact_telephone: "", contact_email: "" },
-    { id: "f2", nom: "Jansen", domaine_id: "d2", site: "", site_cao: "", notes: "", email: "", telephone: "", email_technique: "", contact_nom: "", contact_prenom: "", contact_telephone: "", contact_email: "" },
+    { id: "f1", nom: "Schüco", domaine_id: "d1", site: "", site_cao: "", notes: "", email: "", telephone: "", email_technique: "", contacts: [] },
+    { id: "f2", nom: "Jansen", domaine_id: "d2", site: "", site_cao: "", notes: "", email: "", telephone: "", email_technique: "", contacts: [] },
   ],
 };
 
@@ -93,6 +93,26 @@ describe("contact", () => {
   it("liens tel: et mailto: avec objet", () => {
     expect(lienTel("+41 (0)21 123 45 67")).toBe("tel:+41211234567");
     expect(lienDemande(" info@a.ch ", "Schüco")).toBe("mailto:info@a.ch?subject=Demande%20d'information%20%E2%80%93%20Sch%C3%BCco");
+  });
+  it("la recherche trouve aussi le service et les personnes de contact", () => {
+    const f = { nom: "Sika", contacts: [{ service: "Isolation", nom: "Martin", prenom: "Julie", email: "julie@sika.ch" }, { service: "Bois", nom: "Dupont" }] };
+    expect(correspond(f, "Etancheite", "isolation martin")).toBe(true);
+    expect(correspond(f, "Etancheite", "dupont bois")).toBe(true);
+    expect(correspond(f, "Etancheite", "durand")).toBe(false);
+  });
+  it("lit les contacts d'une ligne sans se fier a son contenu", () => {
+    expect(lireContacts(undefined)).toEqual([]);
+    expect(lireContacts([{ nom: "Dupont", service: "Bois" }, {}, null, "x"])).toEqual([{ service: "Bois", nom: "Dupont", prenom: "", telephone: "", email: "" }]);
+  });
+  it("une ancienne sauvegarde (une seule personne) est reprise comme premier contact", () => {
+    const vieux = { app: "access", version: 2, le: "", domaines: [{ nom: "Isolation", ordre: 1 }], fournisseurs: [{ nom: "Sika", domaine: "Isolation", contact_nom: "Dupont", contact_prenom: "Marc" }] };
+    const p = planifier(vieux, { domaines: [], fournisseurs: [] });
+    expect(p.aAjouter[0].contacts).toEqual([{ service: "", nom: "Dupont", prenom: "Marc", telephone: "", email: "" }]);
+  });
+  it("la sauvegarde garde plusieurs personnes avec leur service", () => {
+    const base: Annuaire = { domaines: [{ id: "d1", nom: "Isolation", ordre: 1 }], fournisseurs: [{ id: "f1", nom: "Sika", domaine_id: "d1", site: "", site_cao: "", notes: "", email: "", telephone: "", email_technique: "", contacts: [{ service: "Bois", nom: "Dupont", prenom: "", telephone: "", email: "" }, { service: "Isolation", nom: "Martin", prenom: "Julie", telephone: "", email: "" }] }] };
+    const p = planifier(JSON.parse(JSON.stringify(exporter(base))), { domaines: [], fournisseurs: [] });
+    expect(p.aAjouter[0].contacts.map((c) => c.service)).toEqual(["Bois", "Isolation"]);
   });
   it("la recherche trouve aussi l'email", () => {
     expect(correspond({ nom: "X", email: "info@flumroc.ch" }, "Isolation", "flumroc")).toBe(true);

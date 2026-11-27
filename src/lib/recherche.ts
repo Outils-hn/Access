@@ -3,12 +3,12 @@
 export const sansAccents = (s: string) =>
   s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/ß/g, "ss");
 
-export type Cherchable = { nom: string; notes?: string; site?: string; site_cao?: string; email?: string; contact_nom?: string; contact_prenom?: string; contact_email?: string };
+export type Cherchable = { nom: string; notes?: string; site?: string; site_cao?: string; email?: string; contacts?: { service?: string; nom?: string; prenom?: string; email?: string }[] };
 
 export function correspond(f: Cherchable, domaine: string, q: string): boolean {
   const mots = sansAccents(q).split(/\s+/).filter(Boolean);
   if (!mots.length) return true;
-  const texte = sansAccents([f.nom, domaine, f.notes ?? "", hote(f.site), hote(f.site_cao), f.email ?? "", f.contact_nom ?? "", f.contact_prenom ?? "", f.contact_email ?? ""].join(" "));
+  const texte = sansAccents([f.nom, domaine, f.notes ?? "", hote(f.site), hote(f.site_cao), f.email ?? "", ...(f.contacts ?? []).flatMap((c) => [c.service ?? "", c.nom ?? "", c.prenom ?? "", c.email ?? ""])].join(" "));
   return mots.every((m) => texte.includes(m));
 }
 

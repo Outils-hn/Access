@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Eye, EyeOff } from "lucide-react";
+import { ChevronDown, Eye, EyeOff, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useCompte } from "@/lib/compte";
-import { useAcces, useActions, useAnnuaire, type Fournisseur } from "@/lib/donnees";
+import { contactRempli, contactVide, useAcces, useActions, useAnnuaire, type Contact, type Fournisseur } from "@/lib/donnees";
 import { emailOk, normaliserUrl, telephoneOk, urlOk } from "@/lib/recherche";
 
 type Props = { open: boolean; onOpenChange: (o: boolean) => void; initial: Fournisseur | null; domaineParDefaut?: string; nomParDefaut?: string };
@@ -39,7 +39,8 @@ function BlocAcces({ id, titre, aide, v, set }: { id: string; titre: string; aid
 }
 
 export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefaut, nomParDefaut }: Props) {
-  const { domaines } = useAnnuaire();
+  const annuaire = useAnnuaire();
+  const { domaines } = annuaire;
   const acces = useAcces();
   const { concepteur } = useCompte();
   const { enregistrerFournisseur, enregistrerAcces } = useActions();
@@ -50,10 +51,7 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
   const [notes, setNotes] = useState("");
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
-  const [cNom, setCNom] = useState("");
-  const [cPrenom, setCPrenom] = useState("");
-  const [cTel, setCTel] = useState("");
-  const [cMail, setCMail] = useState("");
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [cOuvert, setCOuvert] = useState(false);
   const [bureau, setBureau] = useState<Champs>({ identifiant: "", mdp: "" });
   const [perso, setPerso] = useState<Champs>({ identifiant: "", mdp: "" });
@@ -67,8 +65,8 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
     const { premier, acces: a } = courant.current;
     setNom(initial?.nom ?? nomParDefaut ?? ""); setDomaine(initial?.domaine_id ?? domaineParDefaut ?? premier);
     setSite(initial?.site ?? ""); setCao(initial?.site_cao ?? ""); setNotes(initial?.notes ?? "");
-    setEmail(initial?.email ?? ""); setTelephone(initial?.telephone ?? ""); setCNom(initial?.contact_nom ?? ""); setCPrenom(initial?.contact_prenom ?? ""); setCTel(initial?.contact_telephone ?? ""); setCMail(initial?.contact_email ?? "");
-    setCOuvert(!!(initial?.contact_nom || initial?.contact_prenom || initial?.contact_telephone || initial?.contact_email));
+    setEmail(initial?.email ?? ""); setTelephone(initial?.telephone ?? ""); setContacts(initial?.contacts?.map((c) => ({ ...c })) ?? []);
+    setCOuvert(!!initial?.contacts?.length);
     const b = initial ? a.bureau(initial.id) : null, p = initial ? a.perso(initial.id) : null;
     setBureau({ identifiant: b?.identifiant ?? "", mdp: b?.mot_de_passe ?? "" });
     setPerso({ identifiant: p?.identifiant ?? "", mdp: p?.mot_de_passe ?? "" });
@@ -76,15 +74,18 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
 
   const siteFaux = !urlOk(site) ? "Adresse du site invalide : exemple schueco.com." : "";
   const caoFaux = !urlOk(cao) ? "Adresse du site CAO invalide : exemple schueco.com." : "";
-  const contactFaux = !emailOk(email) || !emailOk(cMail) ? "Email invalide : nom@domaine.ch."
-    : !telephoneOk(telephone) || !telephoneOk(cTel) ? "Téléphone : chiffres, espaces et + seulement." : "";
+  const contactFaux = !emailOk(email) || contacts.some((c) => !emailOk(c.email)) ? "Email invalide : nom@domaine.ch."
+    : !telephoneOk(telephone) || contacts.some((c) => !telephoneOk(c.telephone)) ? "Téléphone : chiffres, espaces et + seulement." : "";
+  // Propositions de service : les domaines et les services deja saisis chez les autres fournisseurs
+  const services = [...new Set([...domaines.map((d) => d.nom), ...annuaire.fournisseurs.flatMap((f) => f.contacts.map((c) => c.service))].filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr"));
+  const changer = (i: number, champ: keyof Contact, v: string) => setContacts((l) => l.map((c, j) => (j === i ? { ...c, [champ]: v } : c)));
 
   const enregistrer = async () => {
     setBusy(true);
     try {
       const id = await enregistrerFournisseur({ id: initial?.id, nom: nom.trim(), domaine_id: domaine, site: normaliserUrl(site), site_cao: normaliserUrl(cao), notes: notes.trim(),
         email: email.trim(), telephone: telephone.trim(), email_technique: initial?.email_technique ?? "",
-        contact_nom: cNom.trim(), contact_prenom: cPrenom.trim(), contact_telephone: cTel.trim(), contact_email: cMail.trim() });
+        contacts: contacts.map((c) => ({ service: c.service.trim(), nom: c.nom.trim(), prenom: c.prenom.trim(), telephone: c.telephone.trim(), email: c.email.trim() })).filter(contactRempli) });
       if (!id) return;
       // Identifiants : reserves au concepteur ; pour les autres comptes, rien n'est lu ni ecrit
       const okB = !concepteur || await enregistrerAcces(id, false, bureau.identifiant, bureau.mdp, initial ? acces.bureau(initial.id) : null);
@@ -138,26 +139,41 @@ export function FournisseurDialog({ open, onOpenChange, initial, domaineParDefau
             </div>
             <details className="group rounded-md border border-border/70 px-3 py-2" open={cOuvert} onToggle={(e) => setCOuvert(e.currentTarget.open)}>
               <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium">
-                <span>Personne de contact <span className="font-normal text-muted-foreground">(facultatif)</span></span>
+                <span>Personnes de contact <span className="font-normal text-muted-foreground">(facultatif)</span></span>
                 <ChevronDown className="size-4 text-muted-foreground transition-transform group-open:rotate-180" />
               </summary>
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="f-cnom">Nom</Label>
-                  <Input id="f-cnom" value={cNom} onChange={(e) => setCNom(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="f-cprenom">Prénom</Label>
-                  <Input id="f-cprenom" value={cPrenom} onChange={(e) => setCPrenom(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="f-ctel">Téléphone</Label>
-                  <Input id="f-ctel" type="tel" value={cTel} aria-invalid={!telephoneOk(cTel) || undefined} onChange={(e) => setCTel(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="f-cmail">Email</Label>
-                  <Input id="f-cmail" type="email" placeholder="prenom.nom@fournisseur.ch" value={cMail} aria-invalid={!emailOk(cMail) || undefined} onChange={(e) => setCMail(e.target.value)} />
-                </div>
+              <datalist id="f-services">{services.map((x) => <option key={x} value={x} />)}</datalist>
+              <div className="mt-3 space-y-3">
+                {contacts.map((c, i) => (
+                  <div key={i} role="group" aria-label={`Personne de contact ${i + 1}`} className="space-y-3 rounded-md border border-border/70 p-3">
+                    <div className="flex items-end gap-2">
+                      <div className="min-w-0 flex-1 space-y-1.5">
+                        <Label htmlFor={`c${i}-service`}>Service</Label>
+                        <Input id={`c${i}-service`} list="f-services" placeholder="Bois, Isolation…" maxLength={60} value={c.service} onChange={(e) => changer(i, "service", e.target.value)} />
+                      </div>
+                      <Button type="button" variant="ghost" size="icon" aria-label={`Retirer la personne de contact ${i + 1}`} title="Retirer cette personne" onClick={() => setContacts((l) => l.filter((_, j) => j !== i))}><Trash2 className="size-4" /></Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label htmlFor={`c${i}-nom`}>Nom</Label>
+                        <Input id={`c${i}-nom`} maxLength={80} value={c.nom} onChange={(e) => changer(i, "nom", e.target.value)} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor={`c${i}-prenom`}>Prénom</Label>
+                        <Input id={`c${i}-prenom`} maxLength={80} value={c.prenom} onChange={(e) => changer(i, "prenom", e.target.value)} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor={`c${i}-tel`}>Téléphone</Label>
+                        <Input id={`c${i}-tel`} type="tel" value={c.telephone} aria-invalid={!telephoneOk(c.telephone) || undefined} onChange={(e) => changer(i, "telephone", e.target.value)} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor={`c${i}-mail`}>Email</Label>
+                        <Input id={`c${i}-mail`} type="email" placeholder="prenom.nom@fournisseur.ch" value={c.email} aria-invalid={!emailOk(c.email) || undefined} onChange={(e) => changer(i, "email", e.target.value)} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <Button type="button" variant="outline" size="sm" onClick={() => { setContacts((l) => [...l, contactVide()]); }}><Plus className="size-4" /> Ajouter une personne</Button>
               </div>
             </details>
             {contactFaux ? <p role="alert" className="text-xs text-destructive">{contactFaux}</p>

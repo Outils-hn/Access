@@ -8,9 +8,20 @@ export type Fournisseur = {
   id: string; nom: string; domaine_id: string; site: string; site_cao: string; notes: string;
   /** Contact general (coordonnees publiques du fournisseur) */
   email: string; telephone: string; email_technique: string;
-  /** Personne de contact (facultatif) */
-  contact_nom: string; contact_prenom: string; contact_telephone: string; contact_email: string; updated_at?: string;
+  /** Personnes de contact (facultatif), chacune pouvant avoir un service (Bois, Isolation...) */
+  contacts: Contact[]; updated_at?: string;
 };
+export type Contact = { service: string; nom: string; prenom: string; telephone: string; email: string };
+export const contactVide = (): Contact => ({ service: "", nom: "", prenom: "", telephone: "", email: "" });
+/** Une ligne de contact sans rien de rempli n'est pas enregistree. */
+export const contactRempli = (c: Contact) => !!(c.service || c.nom || c.prenom || c.telephone || c.email);
+/** Lit la colonne jsonb sans se fier a son contenu (ancienne copie locale, ligne abimee). */
+export function lireContacts(v: unknown): Contact[] {
+  if (!Array.isArray(v)) return [];
+  return v.filter((x) => x && typeof x === "object").map((x: Record<string, unknown>) => ({
+    service: String(x.service ?? ""), nom: String(x.nom ?? ""), prenom: String(x.prenom ?? ""), telephone: String(x.telephone ?? ""), email: String(x.email ?? ""),
+  })).filter(contactRempli);
+}
 export type Acces = { id: string; fournisseur_id: string; proprietaire: string | null; identifiant: string; mot_de_passe: string };
 export type Annuaire = { domaines: Domaine[]; fournisseurs: Fournisseur[]; horsLigne?: string };
 
@@ -21,18 +32,18 @@ async function charger(): Promise<Annuaire> {
   try {
     const [d, f] = await Promise.all([
       db.from("access_domaines").select("id,nom,ordre").order("ordre").order("nom"),
-      db.from("access_fournisseurs").select("id,nom,domaine_id,site,site_cao,notes,email,telephone,email_technique,contact_nom,contact_prenom,contact_telephone,contact_email,updated_at").order("nom"),
+      db.from("access_fournisseurs").select("id,nom,domaine_id,site,site_cao,notes,email,telephone,email_technique,contacts,updated_at").order("nom"),
     ]);
     const err = d.error || f.error;
     if (err) throw err;
-    const a: Annuaire = { domaines: d.data ?? [], fournisseurs: f.data ?? [] };
+    const a: Annuaire = { domaines: d.data ?? [], fournisseurs: (f.data ?? []).map((x) => ({ ...x, contacts: lireContacts((x as { contacts?: unknown }).contacts) })) };
     // Copie locale SANS les acces : seulement noms, liens et notes
     try { localStorage.setItem(COPIE, JSON.stringify({ ...a, le: new Date().toISOString() })); } catch { /* stockage plein ou bloque */ }
     return a;
   } catch (e) {
     try {
       const raw = localStorage.getItem(COPIE);
-      if (raw) { const c = JSON.parse(raw); return { domaines: c.domaines, fournisseurs: c.fournisseurs, horsLigne: c.le }; }
+      if (raw) { const c = JSON.parse(raw); return { domaines: c.domaines, fournisseurs: (c.fournisseurs as Fournisseur[]).map((x) => ({ ...x, contacts: lireContacts(x.contacts) })), horsLigne: c.le }; }
     } catch { /* copie illisible */ }
     throw e;
   }
